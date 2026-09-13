@@ -4,3 +4,4 @@ dist/
 TASKS.md
 .DS_Store
 *.local
+*.tsbuildinfo
