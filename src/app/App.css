@@ -1,0 +1,6 @@
+#root {
+  position: relative;
+  height: 100%;
+  /* 安全区：iPad 横屏和刘海机上别把麦克风按钮顶到边缘 */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
