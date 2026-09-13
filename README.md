@@ -82,15 +82,35 @@ scene_intro → teacher_model → child_observe → child_invite → listening
 
 ## 接入真人录音
 
-浏览器 TTS 是开发期方案。核心示范句建议换成预录音，保证音色、节奏和重复播放一致：
+浏览器 TTS 是开发期方案。核心示范句应换成预录音，保证音色、节奏和重复播放一致。
+**代码一行都不用改**——`src/speech/synthesis.ts` 优先找录音，找不到才回落 TTS。
 
-1. 把音频放进 `public/audio/`
-2. 在 `public/audio/manifest.json` 里写台词到文件名的映射：
-   ```json
-   { "We need an umbrella because it is raining.": "umbrella-rain.mp3" }
-   ```
+```bash
+pnpm audio:extract   # 从内容层生成录音脚本 + manifest 模板
+# …照着 public/audio/RECORDING-SCRIPT.md 录，音频放进 public/audio/
+cp public/audio/manifest.template.json public/audio/manifest.json
+pnpm audio:verify    # 还差哪些？哪些录了但已失效？
+```
 
-代码一行都不用改——`src/speech/synthesis.ts` 会优先找录音，找不到才回落 TTS。
+`pnpm audio:extract` 产出 `public/audio/RECORDING-SCRIPT.md`：162 处发声按文本去重成
+**132 句**，按故事顺序排好，每句带建议文件名和语气提示。跨场景复用的句子
+（`Start like this.` 出现 18 处）单列一节，只录一次。
+
+**可以分批录。** manifest 里没有的句子自动走 TTS，录一个场景就能立刻听到效果；
+同一次会话里录音和 TTS 混用是正常路径，有测试守着。
+
+`pnpm audio:verify` 查四件事，其中第三件最要紧：
+
+| 报告项 | 后果 |
+|---|---|
+| 还没录 | 走 TTS，是进度不是错误 |
+| manifest 指向的文件不存在 | 404 后静默回落 TTS |
+| **manifest 里的台词内容层已经没有了** | **改了台词，旧录音再也播不到，那句悄悄变回机器音** |
+| 录了但 manifest 没引用 | 白录了，代码不会去找 |
+
+第三项是唯一只能靠耳朵发现的失败，所以值得专门查。改过 `src/content/*.ts`
+之后重跑一次 `audio:extract` 和 `audio:verify`。CI 里用 `node scripts/verify-audio.ts --strict`
+——「还没录」不算错，只有上表后三项会让它退出码 1。
 
 ## 家长端
 
