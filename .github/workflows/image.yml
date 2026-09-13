@@ -1,0 +1,62 @@
+name: build image
+
+# 构建镜像并推到 ghcr，供 muvee 的 image 类型项目拉取。
+#
+# 为什么在 CI 构建而不是本地：runner 是**原生 amd64**。在 Apple Silicon 上
+# 交叉构建 amd64 会让 esbuild（Go 写的）崩在 lfstack.push invalid packing，
+# 而 runner 上不存在这个问题。顺带 GITHUB_TOKEN 自带 packages:write，
+# 不需要任何额外 PAT。
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # 推 ghcr 靠的就是这一条；GITHUB_TOKEN 自动获得该权限
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          # latest 给 muvee 拉；sha 标签留一条可回溯的线
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/bear-english-hut:latest
+            ghcr.io/${{ github.repository_owner }}/bear-english-hut:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test the image
+        run: |
+          # 构建完就地起一个容器验一遍，免得把一个起不来的镜像推给 muvee。
+          # 注意这里拉的是刚推上去的 latest。
+          docker run -d --name smoke -p 8080:8080 \
+            ghcr.io/${{ github.repository_owner }}/bear-english-hut:latest
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8080/healthz >/dev/null && break
+            sleep 1
+          done
+          curl -sf http://localhost:8080/healthz
+          # 首页和一个音频文件都要在，后者是最容易在打包时漏掉的东西
+          curl -sf -o /dev/null http://localhost:8080/
+          curl -sf -o /dev/null http://localhost:8080/audio/manifest.json
+          echo "smoke ok"
+          docker rm -f smoke
