@@ -1,6 +1,7 @@
 # 构建上下文里不需要的东西。node_modules 尤其重要：
 # 本地装的是 darwin-arm64 的二进制，带进 linux/amd64 镜像只会添乱。
 node_modules
+dist
 .worktrees
 .git
 .playwright-cli
