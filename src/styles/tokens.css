@@ -1,0 +1,63 @@
+/* 小熊英语小屋 — 设计基底
+ *
+ * 视觉规约来自设计文档 §7：手绘绘本舞台、米白纸张背景、番茄红 / 叶子绿 / 深海蓝。
+ * 明令回避：紫色渐变、统一圆角卡片、积分排行榜、过度动画。
+ *
+ * 所以这里没有 --radius-md 这类"万物同一圆角"的 token。绘本里的形状是画出来的，
+ * 每个都不一样——圆角用 --wobble-* 那组不对称值，挑一个用，别求统一。
+ */
+
+:root {
+  /* 纸 —— 从最浅的页面到最深的书脊阴影 */
+  --paper: #f4eedf;
+  --paper-lit: #fbf7ec;
+  --paper-shade: #e7ddc6;
+  --paper-deep: #d8cbaf;
+
+  /* 墨 —— 手绘线条。纯黑太硬，用暖褐调的深色 */
+  --ink: #2e2a26;
+  --ink-soft: #5e564c;
+  --ink-faint: #8d8274;
+
+  /* 三个主色，设计文档点名的 */
+  --tomato: #dc5b3c;
+  --tomato-deep: #b44328;
+  --leaf: #4f8f55;
+  --leaf-deep: #37683c;
+  --sea: #235a79;
+  --sea-deep: #17415a;
+
+  /* 辅助：阳光黄用于贴纸和奖励瞬间，不作为界面底色 */
+  --sun: #e9a13b;
+  --sun-deep: #c67f1d;
+
+  /* 字体 —— 只有家长端出现文字。
+   * 刻意不用 Inter：绘本应用的说明文字用旧式衬线更贴调性。 */
+  --font-hand: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", Georgia, serif;
+  --font-ui: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+
+  /* 手绘不对称圆角：四角各不相同，看起来像画歪的 */
+  --wobble-a: 22px 34px 26px 30px / 30px 24px 32px 26px;
+  --wobble-b: 34px 24px 32px 26px / 24px 32px 26px 34px;
+  --wobble-c: 14px 20px 16px 18px / 18px 14px 20px 16px;
+
+  /* 描边宽度阶梯 —— 绘本线条比 UI 线条粗 */
+  --stroke-hair: 1.5px;
+  --stroke: 3px;
+  --stroke-bold: 5px;
+
+  /* 动效：克制。孩子在听故事，不是在看特效 */
+  --ease-soft: cubic-bezier(0.33, 0.9, 0.36, 1);
+  --ease-pop: cubic-bezier(0.22, 1.4, 0.36, 1);
+}
+
+/* 尊重系统的减弱动效偏好 —— 5 岁用户里有对动画敏感的 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
