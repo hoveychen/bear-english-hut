@@ -13,7 +13,7 @@
 let voice: SpeechSynthesisVoice | null = null
 let voicesReady = false
 let manifest: Record<string, string> = {}
-let manifestLoaded = false
+let manifestPromise: Promise<void> | null = null
 
 /** iOS / Safari 要求首次发声必须由用户手势触发，否则后续全部静音。 */
 let unlocked = false
@@ -53,15 +53,30 @@ function ensureVoices() {
   }
 }
 
-async function ensureManifest() {
-  if (manifestLoaded) return
-  manifestLoaded = true
-  try {
-    const res = await fetch(`${AUDIO_BASE}manifest.json`, { cache: 'force-cache' })
-    if (res.ok) manifest = await res.json()
-  } catch {
-    // 没有录音就走 TTS，这是预期路径，不是错误
-  }
+/**
+ * 加载 manifest，**并发安全**。
+ *
+ * 缓存的是 Promise，不是一个 `loaded` 布尔。第一版写成：
+ *
+ *     if (manifestLoaded) return
+ *     manifestLoaded = true        // ← 在 await 之前就置位
+ *     ... await fetch(...)
+ *
+ * 于是第二个在 fetch 落地前进来的调用者直接返回，而 `manifest` 还是空的——
+ * 那句台词明明有音频，却静默回落成了浏览器 TTS。实测里就是这样：
+ * 故事开场白和示范句走了文件，夹在中间的提问句走了 TTS。
+ * 这种错不会报任何错误，只会让一句话音色突变。
+ */
+function ensureManifest(): Promise<void> {
+  manifestPromise ??= (async () => {
+    try {
+      const res = await fetch(`${AUDIO_BASE}manifest.json`, { cache: 'force-cache' })
+      if (res.ok) manifest = await res.json()
+    } catch {
+      // 没有音频就走 TTS，这是预期路径，不是错误
+    }
+  })()
+  return manifestPromise
 }
 
 /** 在第一次用户手势里调一次，解锁 iOS 的语音合成。 */

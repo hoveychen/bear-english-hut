@@ -9,7 +9,10 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit false --emitDeclarationOnly false --pretty",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "audio:extract": "node scripts/extract-lines.ts",
+    "audio:verify": "node scripts/verify-audio.ts",
+    "audio:generate": "node scripts/generate-audio.ts"
   },
   "dependencies": {
     "react": "^19.1.0",

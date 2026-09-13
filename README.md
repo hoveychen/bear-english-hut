@@ -80,17 +80,57 @@ scene_intro → teacher_model → child_observe → child_invite → listening
 都必须能被它自己的意图表命中**。否则会出现"小熊示范了一句，孩子照着说，
 系统还是判没听懂"。
 
-## 接入真人录音
+## 语音：预生成音频 + 浏览器 TTS 兜底
 
-浏览器 TTS 是开发期方案。核心示范句建议换成预录音，保证音色、节奏和重复播放一致：
+孩子听到的每一句都是**预生成的音频文件**，浏览器自带 TTS 只在缺文件时兜底。
 
-1. 把音频放进 `public/audio/`
-2. 在 `public/audio/manifest.json` 里写台词到文件名的映射：
-   ```json
-   { "We need an umbrella because it is raining.": "umbrella-rain.mp3" }
-   ```
+这不是为了音质。浏览器 TTS 的音色**由用户设备决定**——Mac 上是 Samantha、
+Windows 上是 Zira、安卓上又是别的，语速和断句都不一样。预生成把音色、语速、
+节奏钉死在构建产物里，孩子每次听到的小熊都是同一只（设计文档 §8.2）。
+**代码一行都不用改**——`src/speech/synthesis.ts` 优先找音频，找不到才回落 TTS。
 
-代码一行都不用改——`src/speech/synthesis.ts` 会优先找录音，找不到才回落 TTS。
+```bash
+pnpm audio:extract   # 台词总览 → public/audio/LINES.md
+pnpm audio:generate  # 生成音频 + 写 manifest（OpenRouter，约 $0.8 / 全量）
+pnpm audio:verify    # 还差哪些？哪些生成了但已失效？
+```
+
+音频由 OpenRouter 的 `openai/gpt-audio` 生成，需要 `OPENROUTER_API_KEY`
+（环境变量，或 `~/.dsh/.credentials.yaml` 的 `refs` 下）。**可以分批生成**：
+manifest 里没有的句子自动走浏览器 TTS，做一个场景就能立刻听到效果。
+
+每句台词按它在故事里的**角色**分配语气——提问要好奇，支架三不能有一丝责备。
+语气表在 `scripts/audio-lines.ts` 的 `ROLE_TONE`，它会进 TTS 的系统提示词，
+是真的会改变音频的参数，不是注释。
+
+### 三个实测结论（改这部分之前先读）
+
+都反直觉，所以写在这里而不只是埋在注释里：
+
+1. **提示词结构决定成败。** 拿 6 句问句对比：直接把台词丢给模型让它照读
+   **1/6**；包进 `<line>` 标签并强调「这不是在问你」**0/6**（反而更差）；
+   把 user 轮写成「给台本配音」的指令 **6/6**。差别在于台词是否还处在
+   「轮到你说话」的位置——前两种里 `Why do we need an umbrella?` 会被
+   **回答**，而不是念出来。
+2. **`gpt-audio-mini` 比 `gpt-audio` 贵 10 倍。** 同一句 5 词台词：
+   full 用 72 token（$0.0041），mini 用满 16384 token 撞上限（$0.0394）。
+   单价便宜但会跑飞。默认用 full。
+3. **光核对文本不够。** 那次跑飞里模型回报的 transcript 是对的，音频却有
+   16384 个 token。所以除了逐字校对，还有**时长合理性检查**和 `max_tokens` 闸。
+
+### 校验查四件事，第三件最要紧
+
+| 报告项 | 后果 |
+|---|---|
+| 还没生成 | 走浏览器 TTS，是进度不是错误 |
+| manifest 指向的文件不存在 | 404 后静默回落 TTS |
+| **manifest 里的台词内容层已经没有了** | **改了台词，旧音频再也播不到，那句悄悄变回浏览器 TTS** |
+| 生成了但 manifest 没引用 | 白生成了，代码不会去找 |
+
+第三项是唯一只能靠耳朵发现的失败，所以值得专门查。改过 `src/content/*.ts`
+之后重跑 `pnpm audio:extract && pnpm audio:generate`——生成脚本会顺手删掉台词
+已变更的旧音频。CI 里用 `node scripts/verify-audio.ts --strict`：「还没生成」
+不算错，只有上表后三项会让它退出码 1。
 
 ## 家长端
 
