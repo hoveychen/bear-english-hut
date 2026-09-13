@@ -1,0 +1,179 @@
+.pr {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 22px clamp(16px, 4vw, 28px) 64px;
+  font-family: var(--font-ui);
+  color: var(--ink);
+  line-height: 1.72;
+  /* 家长端可以滚动 —— 孩子端不行 */
+  height: 100%;
+  overflow-y: auto;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.pr__top {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+.pr__top h2 {
+  font-size: 27px;
+}
+.pr__back {
+  color: var(--sea);
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pr__intro {
+  margin: 0 0 26px;
+  font-size: 15px;
+  color: var(--ink-soft);
+  /* 左边一道墨线，像笔记本上划的重点 */
+  border-left: var(--stroke) solid var(--leaf);
+  padding-left: 14px;
+}
+.pr__intro strong { color: var(--ink); }
+
+.pr__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* 每张报告是一张纸。四角不一样，跟舞台同一套手绘规则。 */
+.pr__card {
+  background: var(--paper-lit);
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble-b);
+  padding: 20px 22px 16px;
+  box-shadow: 0 6px 0 -1px var(--paper-deep);
+}
+
+.pr__cardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.pr__cardHead h3 { font-size: 21px; }
+.pr__cardHead time { font-size: 13px; color: var(--ink-faint); }
+
+.pr__summary {
+  margin: 0 0 16px;
+  font-family: var(--font-hand);
+  font-size: 17px;
+}
+
+.pr__counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 10px 8px;
+  margin: 0 0 18px;
+  padding: 14px 0;
+  border-top: var(--stroke-hair) solid var(--paper-deep);
+  border-bottom: var(--stroke-hair) solid var(--paper-deep);
+}
+.pr__counts dt { font-size: 12.5px; color: var(--ink-faint); }
+.pr__counts dd {
+  margin: 2px 0 0;
+  font-family: var(--font-hand);
+  font-size: 22px;
+  color: var(--sea);
+}
+
+.pr__obsList {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.pr__obs {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: baseline;
+  gap: 4px 10px;
+  font-size: 14.5px;
+}
+.pr__obsMark { color: var(--ink-faint); justify-self: center; }
+.pr__obs--yes .pr__obsMark { color: var(--leaf); }
+.pr__obs--partial .pr__obsMark { color: var(--sun-deep); }
+
+.pr__obsState {
+  font-size: 13px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  /* 有底色的元素必须同时定前景色，否则换主题就读不出来 */
+  background: var(--paper-shade);
+  color: var(--ink-soft);
+}
+.pr__obs--yes .pr__obsState { background: #e0efdc; color: var(--leaf-deep); }
+.pr__obs--partial .pr__obsState { background: #f6e6c8; color: var(--sun-deep); }
+
+.pr__obsDetail {
+  grid-column: 2 / -1;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+}
+
+.pr__cardFoot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.pr__practice {
+  margin: 0;
+  font-size: 14px;
+}
+.pr__practice strong { display: block; font-size: 12.5px; color: var(--ink-faint); font-weight: 600; }
+.pr__practice span { font-family: var(--font-hand); font-size: 16px; color: var(--tomato-deep); }
+
+.pr__copy {
+  font-size: 13px;
+  color: var(--sea);
+  padding: 5px 12px;
+  border: var(--stroke-hair) solid var(--sea);
+  border-radius: var(--wobble-c);
+}
+
+.pr__empty {
+  padding: 30px 0;
+  color: var(--ink-faint);
+  font-size: 15px;
+}
+
+.pr__family {
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: var(--stroke-hair) dashed var(--paper-deep);
+}
+.pr__family h3 { font-size: 19px; margin-bottom: 8px; }
+.pr__family p { margin: 0; font-size: 14.5px; color: var(--ink-soft); }
+.pr__family em {
+  display: block;
+  margin: 6px 0 0;
+  font-family: var(--font-hand);
+  font-style: normal;
+  color: var(--tomato-deep);
+}
+
+.pr__reset {
+  margin-top: 28px;
+  font-size: 13px;
+  color: var(--ink-faint);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

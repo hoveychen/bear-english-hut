@@ -1,0 +1,123 @@
+.mic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 6vw, 56px);
+  padding: 14px 0 6px;
+}
+
+.mic__center {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.mic__button {
+  position: relative;
+  z-index: 2;
+  width: 108px;
+  height: 108px;
+  display: grid;
+  place-items: center;
+  color: var(--tomato);
+  background: var(--paper-lit);
+  border: var(--stroke-bold) solid var(--ink);
+  /* 手绘的圆：不是 border-radius:50%，是画歪的 */
+  border-radius: 54% 46% 51% 49% / 48% 52% 47% 53%;
+  box-shadow: 0 7px 0 var(--ink);
+  transition: transform 130ms var(--ease-pop), box-shadow 130ms var(--ease-pop);
+}
+
+.mic__button:active:not(:disabled) {
+  transform: translateY(6px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.mic__button.is-busy {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/*
+ * 召唤态：小熊问完了，在等孩子开口。
+ * 这是整个界面里唯一持续运动的元素——因为它是唯一需要孩子行动的地方。
+ */
+.mic__button.is-inviting {
+  animation: mic-call 1.5s var(--ease-soft) infinite;
+}
+@keyframes mic-call {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  42%      { transform: scale(1.08) rotate(-3deg); }
+  70%      { transform: scale(1.02) rotate(2deg); }
+}
+
+.mic__button.is-listening {
+  color: var(--leaf);
+  background: #eaf4e7;
+}
+
+/* 收听中的声波环 */
+.mic__ring {
+  position: absolute;
+  width: 108px;
+  height: 108px;
+  border: var(--stroke) solid var(--leaf);
+  border-radius: 54% 46% 51% 49% / 48% 52% 47% 53%;
+  animation: mic-ring 1.5s var(--ease-soft) infinite;
+}
+.mic__ring--2 { animation-delay: 0.5s; }
+@keyframes mic-ring {
+  0%   { transform: scale(1); opacity: 0.75; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* 波形：只表示"在听"，不显示听到的文字 */
+.mic__wave {
+  position: absolute;
+  bottom: -26px;
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+  height: 20px;
+}
+.mic__wave span {
+  width: 6px;
+  height: 7px;
+  background: var(--leaf);
+  border-radius: 3px;
+  animation: mic-bar 0.68s var(--ease-soft) infinite;
+}
+.mic__wave span.is-active {
+  animation-duration: 0.36s;
+}
+@keyframes mic-bar {
+  0%, 100% { height: 7px; }
+  50%      { height: 20px; }
+}
+
+/* 侧边的小按钮：重播 / 跳过 */
+.mic__side {
+  width: 66px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+  color: var(--sea);
+  background: var(--paper-lit);
+  border: var(--stroke) solid var(--ink);
+  border-radius: 48% 52% 46% 54% / 53% 47% 55% 45%;
+  box-shadow: 0 5px 0 var(--ink);
+  transition: transform 130ms var(--ease-pop), box-shadow 130ms var(--ease-pop);
+}
+.mic__side:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+.mic__side:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+@media (max-width: 720px) {
+  .mic__button, .mic__ring { width: 88px; height: 88px; }
+  .mic__side { width: 54px; height: 54px; }
+}

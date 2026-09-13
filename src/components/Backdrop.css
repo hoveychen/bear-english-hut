@@ -1,0 +1,29 @@
+.backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* transform-origin 由组件按太阳实际位置内联给出（窗内/室外位置不同） */
+.bd-sun {
+  animation: bd-sun-turn 26s linear infinite;
+}
+@keyframes bd-sun-turn {
+  to { transform: rotate(360deg); }
+}
+
+/* 落程用变量：窗内的雨只需要落一小段，室外才落满屏。
+   固定 330px 在窗口里会让雨点全部一次性冲出裁剪区，看起来像在闪。 */
+.bd-rain {
+  --fall: 330px;
+}
+.bd-raindrop {
+  animation: bd-fall 1.15s linear infinite;
+}
+@keyframes bd-fall {
+  0%   { transform: translateY(-30px); opacity: 0; }
+  18%  { opacity: 0.9; }
+  100% { transform: translateY(var(--fall)); opacity: 0; }
+}

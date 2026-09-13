@@ -1,0 +1,140 @@
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  /* 手绘纸片的边：四角不一样，像裁下来贴上去的 */
+  border-radius: var(--wobble-a);
+  border: var(--stroke-bold) solid var(--ink);
+  box-shadow: 0 10px 0 -2px var(--paper-deep), 0 18px 34px rgba(46, 42, 38, 0.22);
+}
+
+.stage__field {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * 小熊站在**左侧**，不在正中。
+ *
+ * 摆中间是最直觉的构图，但舞台上同时要放 2–5 个可操作物品，居中的小熊会把
+ * 它们挤到两边、或者被盖住（第一版实测时香蕉正好糊在他脸上）。让出中右侧这块
+ * 连续的地面之后，物品能排成一条孩子从左读到右的线，小熊则像在旁边看着她挑。
+ */
+.stage__bear {
+  position: absolute;
+  left: 16%;
+  bottom: 3%;
+  transform: translateX(-50%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+@media (max-width: 720px) {
+  .stage__bear { left: 14%; }
+}
+
+/* ── 可操作物品 ─────────────────────────────────────── */
+
+.stage__object {
+  position: absolute;
+  transform: translate(-50%, -50%) scale(var(--obj-scale, 1));
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  transition: transform 180ms var(--ease-pop), filter 180ms var(--ease-soft);
+}
+
+.stage__objectArt {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  /* 物品也投一点影，才像放在场景里而不是贴在玻璃上 */
+  filter: drop-shadow(0 5px 0 rgba(46, 42, 38, 0.16));
+}
+
+.stage__objectArt img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.stage__object.is-tappable {
+  cursor: pointer;
+}
+.stage__object.is-tappable:hover {
+  transform: translate(-50%, -50%) scale(calc(var(--obj-scale, 1) * 1.09));
+}
+.stage__object:disabled {
+  cursor: default;
+}
+
+/* 选中：垫一张手撕纸片在底下，而不是加个蓝框 */
+.stage__object.is-selected .stage__objectArt::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background: var(--sun);
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble-c);
+  z-index: -1;
+  opacity: 0.9;
+}
+.stage__object.is-selected {
+  transform: translate(-50%, -50%) scale(calc(var(--obj-scale, 1) * 1.12)) rotate(-3deg);
+}
+
+/*
+ * 支架的"看这里"：物品自己轻轻跳。
+ * 这是设计文档 §7 里图片提示的落点——不用箭头、不用文字、不用高亮框。
+ */
+.stage__object.is-highlighted .stage__objectArt {
+  animation: obj-hop 1.1s var(--ease-pop) infinite;
+}
+@keyframes obj-hop {
+  0%, 62%, 100% { transform: translateY(0) rotate(0deg); }
+  72%           { transform: translateY(-15px) rotate(-5deg); }
+  86%           { transform: translateY(-4px) rotate(3deg); }
+}
+
+/* ── 篮子里的东西 ───────────────────────────────────── */
+
+.stage__collected {
+  position: absolute;
+  left: 3%;
+  top: 4%;
+  z-index: 5;
+  display: flex;
+  gap: 2px;
+  padding: 10px 14px;
+  background: rgba(251, 247, 236, 0.9);
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble-c);
+}
+
+.stage__collected img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  /* 每个略微歪一点，像随手丢进去的 */
+  transform: rotate(calc((var(--i) - 1) * 6deg));
+  animation: collect-drop 420ms var(--ease-pop) backwards;
+}
+@keyframes collect-drop {
+  from { transform: translateY(-34px) scale(1.5) rotate(-16deg); opacity: 0; }
+}
+
+@media (max-width: 720px) {
+  .stage__object {
+    width: 78px;
+    height: 78px;
+  }
+  .stage__collected img {
+    width: 34px;
+    height: 34px;
+  }
+}
