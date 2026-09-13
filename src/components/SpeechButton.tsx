@@ -34,7 +34,20 @@ export function SpeechButton({
   onSkip,
 }: Props) {
   const listening = phase === 'listening'
-  const busy = phase === 'prompt' || phase === 'intro' || phase === 'support' || phase === 'success' || phase === 'thinking'
+  /**
+   * 小熊正在说话的所有阶段。这些时候按钮都要禁掉。
+   *
+   * `fallback` 一度漏在这个名单外，后果是完整示范播放期间跳过键仍可点：
+   * 连点就会一遍遍重启那段示范，永远走不到"点一下继续"。
+   * 五岁孩子一定会连点按钮——凡是小熊在出声的阶段，都必须在这里列全。
+   */
+  const busy =
+    phase === 'prompt' ||
+    phase === 'intro' ||
+    phase === 'support' ||
+    phase === 'fallback' ||
+    phase === 'success' ||
+    phase === 'thinking'
   const usable = micSupported && !voiceDisabled
 
   return (

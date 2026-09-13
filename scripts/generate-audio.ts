@@ -44,6 +44,8 @@ const FORCE = flag('force')
 const DRY = flag('dry-run')
 /** 并发。132 句串行要十几分钟；4 路并发既快又不至于撞限流。 */
 const CONCURRENCY = Number(value('concurrency', '4'))
+/** 跑飞是随机的，重试是最有效的手段。默认 3 次，补漏时可以调高。 */
+const RETRIES = Number(value('retries', '3'))
 
 /**
  * 成本按**词数**估，不是按句数。
@@ -112,7 +114,7 @@ async function main() {
       // 同一句可能出现在多处，语气取第一处的角色——那是它的主要用途
       const tone = ROLE_TONE[line.occurrences[0]!.role]
       try {
-        const { mp3, costUsd } = await synthesize(line.text, { apiKey, model, voice: VOICE, tone })
+        const { mp3, costUsd } = await synthesize(line.text, { apiKey, model, voice: VOICE, tone, retries: RETRIES })
         const file = `${line.slug}.mp3`
         fs.writeFileSync(path.join(outDir, file), mp3)
         manifest[line.text] = file

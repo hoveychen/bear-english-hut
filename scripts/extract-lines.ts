@@ -1,14 +1,17 @@
 /**
- * 生成录音脚本。
+ * 生成台词总览。
  *
- *   node scripts/extract-lines.ts
+ *   node scripts/extract-lines.ts   →  public/audio/LINES.md
  *
- * 产出两个文件：
- *   public/audio/RECORDING-SCRIPT.md   —— 念稿的人照着录
- *   public/audio/manifest.template.json —— 全部录完后可直接改名成 manifest.json
+ * 这份文档有两个用途：
  *
- * 内容层改了台词就重跑一次。改完记得 `node scripts/verify-audio.ts` 看看
- * 哪些旧录音失效了。
+ *   1. **审全部英文内容**。三个场景的台词散在 src/content/*.ts 的结构里，
+ *      要判断"这套语言对五岁孩子合不合适"，需要把它们按故事顺序摊平了读。
+ *   2. **看每句被指定了什么语气**。语气不是注释——它会进 TTS 的系统提示词，
+ *      真的决定音频听起来什么样（见 scripts/generate-audio.ts）。
+ *
+ * 音频不在这里生成，用 `node scripts/generate-audio.ts`。
+ * 内容层改了台词就重跑这两个脚本。
  */
 
 import fs from 'node:fs'
@@ -33,7 +36,7 @@ function table(lines: AudioLine[], showWhere: boolean): string {
     const cells = [`\`${l.slug}.${EXT}\``, `**${l.text}**`, ROLE_TONE[role]]
     if (showWhere) {
       // "Start like this." 出现 18 处，全列出来会把表格撑到没法读。
-      // 念稿的人只需要知道"这句到处都用"，不需要逐一核对位置。
+      // 读这份文档只需要知道"这句到处都用"，不需要逐一核对位置。
       const all = l.occurrences.map(
         (o) => `${o.sceneTitle}·${o.beatId ?? '整场'}${o.depth > 0 ? `·追问${o.depth}` : ''}`,
       )
@@ -53,7 +56,7 @@ function build(): string {
 
   const out: string[] = []
 
-  out.push('# 小熊英语小屋 · 录音脚本')
+  out.push('# 小熊英语小屋 · 台词总览')
   out.push('')
   out.push(
     `本文件由 \`scripts/extract-lines.ts\` 从内容层生成，**不要手改**——` +
@@ -61,42 +64,37 @@ function build(): string {
   )
   out.push('')
   out.push(
-    `全片共 **${totalOccurrences}** 处需要发声，去重后只需录 **${lines.length}** 句。` +
-      `（同一句话在多处复用的只录一次，见下面「共用台词」。）`,
+    `全片共 **${totalOccurrences}** 处发声，按文本去重后是 **${lines.length}** 句独立台词。` +
+      `（同一句话在多处复用的只生成一份音频，见下面「共用台词」。）`,
   )
   out.push('')
 
-  out.push('## 怎么录')
+  out.push('## 这份文档怎么用')
   out.push('')
-  out.push('- **一句一个文件**，文件名照下表，放进 `public/audio/`')
-  out.push(`- 格式 \`.${EXT}\`，单声道，44.1kHz 就够；音量统一，句子前后各留约 0.2 秒静音`)
-  out.push('- 语速比平常慢一点，但**不要一个词一个词地蹦**——孩子要听到的是自然句子的节奏')
-  out.push('- 全程同一个人、同一支麦、同一个房间。换音色比音质差更让孩子出戏')
-  out.push('- 念的对象是一个 5 岁孩子，不是摄像机。可以笑，可以停顿')
+  out.push('- **审内容**：三个场景的英文台词按故事顺序摊平在这里，便于整体判断语言难度')
+  out.push('- **看语气**：「语气」一列会进 TTS 的系统提示词，真的决定音频听起来什么样，不是注释')
+  out.push('- **对文件名**：音频文件名由台词文本派生，与 `manifest.json` 的取值一一对应')
   out.push('')
-  out.push('**最要紧的一条**：这不是在播报正确答案。')
-  out.push('支架三（`fallback`）是小熊自己把话说完，语气里不能有一丝「你没说对」——')
-  out.push('孩子说不出来的那一刻，正是最容易被吓退的一刻。')
+  out.push('**其中最要紧的一条语气**：支架三（`fallback`）是小熊自己把话说完，')
+  out.push('语气里不能有一丝「你没说对」——孩子说不出来的那一刻，正是最容易被吓退的一刻。')
   out.push('')
 
-  out.push('## 录完之后')
+  out.push('## 生成音频')
   out.push('')
   out.push('```bash')
-  out.push('# 1. 音频放进 public/audio/')
-  out.push('# 2. 生成 manifest（模板已经按文件名填好）')
-  out.push('cp public/audio/manifest.template.json public/audio/manifest.json')
-  out.push('# 3. 校验：哪些还没录、哪些录了但内容层已经改了')
-  out.push('node scripts/verify-audio.ts')
+  out.push('node scripts/generate-audio.ts              # 生成还缺的')
+  out.push('node scripts/generate-audio.ts --voice coral --force   # 换音色重做')
+  out.push('node scripts/verify-audio.ts               # 复核覆盖率与失效条目')
   out.push('```')
   out.push('')
   out.push(
     '`manifest.json` 里没有的句子会自动回落到浏览器 TTS，' +
-      '所以**可以分批录**——先录一个场景也能立刻听到效果。',
+      '所以**可以分批生成**——先做一个场景也能立刻听到效果。',
   )
   out.push('')
 
   if (shared.length > 0) {
-    out.push('## 共用台词（跨场景复用，各录一次）')
+    out.push('## 共用台词（跨场景复用，各生成一份）')
     out.push('')
     out.push(table(shared, true))
     out.push('')
@@ -164,12 +162,9 @@ function build(): string {
 fs.mkdirSync(outDir, { recursive: true })
 
 const lines = collectLines()
-const manifest = Object.fromEntries(lines.map((l) => [l.text, `${l.slug}.${EXT}`]))
 
-fs.writeFileSync(path.join(outDir, 'RECORDING-SCRIPT.md'), build())
-fs.writeFileSync(path.join(outDir, 'manifest.template.json'), `${JSON.stringify(manifest, null, 2)}\n`)
+fs.writeFileSync(path.join(outDir, 'LINES.md'), build())
 
 const occurrences = lines.reduce((n, l) => n + l.occurrences.length, 0)
-console.log(`✓ ${lines.length} 句待录（${occurrences} 处发声，去重省下 ${occurrences - lines.length} 句）`)
-console.log(`  public/audio/RECORDING-SCRIPT.md`)
-console.log(`  public/audio/manifest.template.json`)
+console.log(`✓ ${lines.length} 句独立台词（${occurrences} 处发声，去重省下 ${occurrences - lines.length} 份音频）`)
+console.log(`  public/audio/LINES.md`)

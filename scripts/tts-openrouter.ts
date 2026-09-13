@@ -1,18 +1,20 @@
 /**
  * OpenRouter 的 TTS 后端。
  *
- * 用 `openai/gpt-audio-mini` 走 chat completions 的音频输出。它不是一个
- * 传统的 TTS 端点，而是一个**会说话的聊天模型**——这带来一个好处和一个风险：
+ * 用 `openai/gpt-audio` 走 chat completions 的音频输出。它不是一个
+ * 传统的 TTS 端点，而是一个**会说话的聊天模型**——这带来一个好处和两个风险：
  *
  *   好处：可以用系统提示词指定"念给一个五岁孩子听"的语气，
  *         而且能按每句台词在故事里的角色分别指定（见 ROLE_TONE）。
- *   风险：聊天模型有时会**回答**这句话而不是**念**它。
- *         "We need an umbrella because it is raining." 有可能被念成
- *         "Yes, you're right, you should bring an umbrella!"——
- *         听起来通顺，但那不是小熊该说的台词。
+ *   风险一：它会**回答**这句话而不是**念**它。"Why do we need an umbrella?"
+ *           被念成 "We need an umbrella to keep us dry when it rains..."——
+ *           听起来通顺，但那不是小熊该说的台词。
+ *   风险二：它会**说不停**，一路生成到撞 token 上限，产出几十秒垃圾音频。
+ *           而且这种时候它回报的 transcript 往往还是对的。
  *
- * 所以每一句都要拿返回的 transcript 与原文逐字核对，对不上就重试，
- * 重试还不行就报错退出。这个校验不是保险，是这条路能不能用的前提。
+ * 所以有两道闸，缺一不可：逐字核对 transcript，以及**按词数核对音频时长**。
+ * 只做前者会漏掉风险二。两道都过不了就重试，重试完还不行就报错——
+ * 绝不把一句来路不明的音频悄悄写进 public/audio/。
  */
 
 import { execFile } from 'node:child_process'
@@ -49,10 +51,11 @@ export const MODELS = {
 /**
  * 单次请求的 token 上限。
  *
- * 这是上面那次跑飞的安全网：正常一句台词只要几十到几百个音频 token，
- * 封在 2048 既够长句用，又能让失控请求在烧掉四毛钱之前停下。
+ * 跑飞的安全网。实测约 20 个音频 token / 秒，全片最长的台词（约 20 词）
+ * 也只要 ~480 个 token，所以 800 对合法内容绰绰有余，又能把一次失控
+ * 从 2048 token（101 秒垃圾音频）压到 40 秒。
  */
-const MAX_TOKENS = 2048
+const MAX_TOKENS = 800
 
 /**
  * 取 API key。优先环境变量，其次 dsh 的凭据文件。
@@ -93,13 +96,54 @@ export function systemPrompt(tone: string): string {
     'You are a text-to-speech engine: you only ever voice the script given to you.',
     'Pronounce clearly and a little slower than adult conversation, with natural sentence rhythm —',
     'not word-by-word robotic.',
+    // 全量跑第一轮时 12 句跑飞，其中 7 句是句首支架（内容层里以 "..." 结尾）：
+    // 模型把它当成"请把这句写完"，于是一路说下去直到撞 token 上限。
+    'Some lines are UNFINISHED sentence-starters — the user turn will say so explicitly.',
+    'For those: voice the fragment with a warm, rising, inviting intonation and STOP IMMEDIATELY.',
+    'The child finishes that sentence, not you. Never continue, complete, or guess the rest.',
+    'In every case: stop speaking the moment the line is done. Add no trailing silence, no extra words.',
     `Delivery for this line: ${tone}`,
   ].join(' ')
 }
 
-/** user 轮必须是一条**配音指令**，台词只是它的素材。见 systemPrompt 的实测记录。 */
-export function userPrompt(text: string): string {
+/**
+ * user 轮必须是一条**配音指令**，台词只是它的素材。见 systemPrompt 的实测记录。
+ *
+ * `isFragment` 必须显式传：因为 spokenForm 已经把 "..." 去掉了，
+ * 模型再也看不到那个省略号，"遇到省略号就收住"的规则会变成一条死规则。
+ * 第一版就是这么翻车的——去掉省略号止住了大部分跑飞，却同时删掉了
+ * 唯一告诉模型"这句没写完、别替我写完"的信号。
+ */
+export function userPrompt(text: string, isFragment: boolean): string {
+  if (isFragment) {
+    return [
+      "This is an UNFINISHED sentence-starter from the bear's script.",
+      'Voice exactly these words and then stop — the child says the rest.',
+      'Do not finish the sentence, do not add a single word.',
+      `\n\n<line>${text}</line>`,
+    ].join(' ')
+  }
   return `Voice this line of the bear's script verbatim, adding nothing:\n\n<line>${text}</line>`
+}
+
+/** 内容层用句尾省略号标记"这句留给孩子接"。 */
+export function isFragment(text: string): boolean {
+  return /(\.{2,}|…)\s*$/.test(text.trim())
+}
+
+/**
+ * 送去朗读之前，去掉句尾的省略号。
+ *
+ * `I think it is ...` 这类句首支架里的 "..." 是**给屏幕看的教学约定**——
+ * 表示"这句留给孩子接"。但模型看到它就会去把句子写完，一路说到撞 token 上限：
+ * 光靠提示词叮嘱只救回一半。去掉之后模型念完 "I think it is" 自然收住，
+ * 听感正是我们要的那种悬着的邀请。
+ *
+ * manifest 的键仍然是**原文**（含省略号），因为 synthesis.ts 是拿内容层的
+ * 原文去查表的。逐字核对也不受影响：归一化本来就把标点抹成空格。
+ */
+export function spokenForm(text: string): string {
+  return text.replace(/\s*(\.{2,}|…)\s*$/, '').trim() || text
 }
 
 /** 比对时的归一化：忽略大小写、标点和空白差异，只看词。 */
@@ -127,6 +171,7 @@ async function requestAudio(
   voice: Voice,
   tone: string,
   text: string,
+  temperature: number,
 ): Promise<StreamOut> {
   const res = await fetch(ENDPOINT, {
     method: 'POST',
@@ -141,12 +186,11 @@ async function requestAudio(
       // 流式只支持 pcm16（mp3 会被拒），所以拿裸 PCM 回来自己转码
       audio: { voice, format: 'pcm16' },
       stream: true,
-      // 温度拉到 0：我们要的是复读，不是创作
-      temperature: 0,
+      temperature,
       max_tokens: MAX_TOKENS,
       messages: [
         { role: 'system', content: systemPrompt(tone) },
-        { role: 'user', content: userPrompt(text) },
+        { role: 'user', content: userPrompt(spokenForm(text), isFragment(text)) },
       ],
     }),
   })
@@ -243,6 +287,18 @@ function checkDuration(text: string, pcmBytes: number): string | null {
   return null
 }
 
+/**
+ * 第几次尝试用什么温度。
+ *
+ * 首次用 0：要的是复读，不是创作。但**重试也用 0 就等于没重试**——
+ * 同样的输入确定性地给出同样的输出。"It is behind the ..." 连failed 5 次，
+ * 每次音频都是 39.4/39.5 秒，一看就知道是同一个结果在重复。
+ * 所以从第二次起把温度抬起来，让它有机会跳出那个坏模式。
+ */
+function temperatureFor(attempt: number): number {
+  return attempt === 0 ? 0 : Math.min(0.3 + attempt * 0.25, 1)
+}
+
 export type SynthOptions = {
   apiKey: string
   model: string
@@ -266,7 +322,7 @@ export async function synthesize(text: string, opts: SynthOptions): Promise<Synt
   let spent = 0
 
   for (let attempt = 0; attempt <= retries; attempt++) {
-    const out = await requestAudio(apiKey, model, voice, tone, text)
+    const out = await requestAudio(apiKey, model, voice, tone, text, temperatureFor(attempt))
     spent += out.costUsd
 
     // 两道闸都要过：念的字对，且音频长度合理
@@ -275,7 +331,7 @@ export async function synthesize(text: string, opts: SynthOptions): Promise<Synt
       lastProblem = `朗读与原文不符\n    应念：${text}\n    实念：${out.transcript}`
       continue
     }
-    const durationProblem = checkDuration(text, out.pcm.length)
+    const durationProblem = checkDuration(spokenForm(text), out.pcm.length)
     if (durationProblem) {
       lastProblem = `${durationProblem}\n    台词：${text}`
       continue

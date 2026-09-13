@@ -19,15 +19,19 @@ type Spoken = { audio: string[]; tts: string[] }
  */
 async function freshSynthesis(
   manifest: Record<string, string> | null,
-  opts: { audioFails?: boolean; noSynthesis?: boolean } = {},
+  opts: { audioFails?: boolean; noSynthesis?: boolean; manifestDelayMs?: number } = {},
 ) {
   vi.resetModules()
   const spoken: Spoken = { audio: [], tts: [] }
+  let manifestFetches = 0
 
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string) => {
       if (String(url).endsWith('manifest.json')) {
+        manifestFetches++
+        // 模拟真实网络：manifest 不是立刻就位的
+        if (opts.manifestDelayMs) await new Promise((r) => setTimeout(r, opts.manifestDelayMs))
         if (!manifest) return { ok: false } as Response
         return { ok: true, json: async () => manifest } as unknown as Response
       }
@@ -81,7 +85,7 @@ async function freshSynthesis(
   vi.stubGlobal('speechSynthesis', opts.noSynthesis ? undefined : synth)
 
   const mod = await import('./synthesis')
-  return { mod, spoken }
+  return { mod, spoken, manifestFetches: () => manifestFetches }
 }
 
 beforeEach(() => {
@@ -134,6 +138,23 @@ test('同一次会话里可以录音与 TTS 混用（分批录音的前提）', 
 
   expect(spoken.audio).toEqual(['umbrella-rain.mp3', 'umbrella-rain.mp3'])
   expect(spoken.tts).toEqual(['Not recorded yet.'])
+})
+
+test('manifest 还在路上时并发 speak，两句都要走录音', async () => {
+  // 真实故障：开场白触发了 manifest 的 fetch，紧跟着的提问句在 fetch 落地前
+  // 也调了 speak。旧实现把 `loaded` 布尔在 await 之前就置真，于是第二句拿到
+  // 空 manifest、静默回落 TTS——一句话音色突变，却不报任何错。
+  const { mod, spoken, manifestFetches } = await freshSynthesis(
+    { [LINE]: 'a.mp3', 'Second line.': 'b.mp3' },
+    { manifestDelayMs: 30 },
+  )
+
+  await Promise.all([mod.speak(LINE, { tailMs: 0 }), mod.speak('Second line.', { tailMs: 0 })])
+
+  expect(spoken.tts).toEqual([])
+  expect(spoken.audio.sort()).toEqual(['a.mp3', 'b.mp3'])
+  // 顺带确认没有把 manifest 重复拉两遍
+  expect(manifestFetches()).toBe(1)
 })
 
 test('连 speechSynthesis 都没有的浏览器：speak 照样 resolve，绝不 reject', async () => {

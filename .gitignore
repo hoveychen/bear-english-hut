@@ -5,3 +5,4 @@ TASKS.md
 .DS_Store
 *.local
 *.tsbuildinfo
+.playwright-cli/

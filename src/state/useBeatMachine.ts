@@ -258,12 +258,25 @@ export function useBeatMachine(scene: Scene, onSceneComplete: () => void) {
     setBeatIndex(nextIndex)
   }, [beatIndex, onSceneComplete, say, scene])
 
-  // beatIndex 变了就自动问下一拍。放在 effect 里，让 ask 永远拿到新的 beat。
   const startedRef = useRef(false)
+  /**
+   * 已经问出口的那一拍。
+   *
+   * 不能只靠 `startedRef` 判断：StrictMode 下 effect 会跑两遍，
+   * 第二遍时 `begin()` 已经把 startedRef 置真，于是这个 effect 会**并发地**
+   * 再问一次第一拍——两条播报链叠在一起，孩子听到的顺序全乱。
+   * 记住"问到第几拍"就与 effect 跑几遍无关了。
+   */
+  const askedIndexRef = useRef(-1)
+
+  // beatIndex 变了就自动问下一拍。放在 effect 里，让 ask 永远拿到新的 beat。
   useEffect(() => {
     if (!startedRef.current) return
+    if (askedIndexRef.current === beatIndex) return
     const next = scene.beats[beatIndex]
-    if (next) void ask(questionFromBeat(next), false)
+    if (!next) return
+    askedIndexRef.current = beatIndex
+    void ask(questionFromBeat(next), false)
     // ask 依赖 beat，beat 由 beatIndex 推出，这里只跟 beatIndex 走
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [beatIndex])
@@ -494,6 +507,14 @@ export function useBeatMachine(scene: Scene, onSceneComplete: () => void) {
   const begin = useCallback(async () => {
     if (startedRef.current) return
     startedRef.current = true
+    /*
+     * 同步认领第 0 拍，必须在任何 await 之前。
+     *
+     * begin() 一旦 await 了开场白，控制权就交了出去；StrictMode 的第二遍
+     * effect 这时看到 startedRef 已为真、而第 0 拍还没被认领，就会自己去问一遍。
+     * 结果是提问句播两遍。认领要在"决定要问"的那一刻，不是"问出口"的那一刻。
+     */
+    askedIndexRef.current = 0
     unlockSpeech()
     setPhase('intro')
     setMood('happy')
