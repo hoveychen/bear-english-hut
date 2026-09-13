@@ -1,0 +1,24 @@
+.backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.bd-sun {
+  transform-origin: 870px 105px;
+  animation: bd-sun-turn 26s linear infinite;
+}
+@keyframes bd-sun-turn {
+  to { transform: rotate(360deg); }
+}
+
+.bd-raindrop {
+  animation: bd-fall 1.15s linear infinite;
+}
+@keyframes bd-fall {
+  0%   { transform: translateY(-30px); opacity: 0; }
+  18%  { opacity: 0.9; }
+  100% { transform: translateY(330px); opacity: 0; }
+}

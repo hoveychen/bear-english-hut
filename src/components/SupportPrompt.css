@@ -1,0 +1,92 @@
+.support {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 4px 0;
+  animation: support-in 380ms var(--ease-pop);
+}
+@keyframes support-in {
+  from { opacity: 0; transform: translateY(14px); }
+}
+
+.support__slot {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.support__card {
+  position: relative;
+  width: 82px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+  background: var(--paper-lit);
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble-c);
+  box-shadow: 0 4px 0 var(--paper-deep);
+  transform: rotate(var(--tilt, 0deg));
+}
+
+.support__card img {
+  width: 62%;
+  height: 62%;
+  object-fit: contain;
+}
+
+.support__blank {
+  width: 40%;
+  height: 40%;
+  border: var(--stroke) dashed var(--ink-faint);
+  border-radius: var(--wobble-c);
+}
+
+/* 序号点：贴在卡片左上角的小圆点，一个、两个、三个 */
+.support__dots {
+  position: absolute;
+  top: -9px;
+  left: 6px;
+  display: flex;
+  gap: 3px;
+}
+.support__dots i {
+  width: 9px;
+  height: 9px;
+  background: var(--tomato);
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+
+.support__arrow {
+  width: 40px;
+  height: 26px;
+  flex: none;
+}
+
+.support__replay {
+  margin-left: 8px;
+  width: 58px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  background: var(--paper-lit);
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--wobble-c);
+  box-shadow: 0 4px 0 var(--ink);
+  animation: support-nudge 2.2s var(--ease-soft) infinite;
+}
+.support__replay:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+@keyframes support-nudge {
+  0%, 82%, 100% { transform: translateY(0); }
+  90%           { transform: translateY(-5px); }
+}
+
+@media (max-width: 720px) {
+  .support__card { width: 62px; height: 62px; }
+  .support__arrow { width: 28px; }
+}
