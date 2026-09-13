@@ -143,8 +143,8 @@ export function Bear({
 
             {/* 眉毛 */}
             <g stroke="#2e2a26" strokeWidth="3.6" strokeLinecap="round" className="bear__brows">
-              <line x1="68" y1={54 + browDy} x2="86" y2={54 + browDy} transform={`rotate(${browL} 77 ${54 + browDy})`} />
-              <line x1="114" y1={54 + browDy} x2="132" y2={54 + browDy} transform={`rotate(${browR} 123 ${54 + browDy})`} />
+              <line x1="68" y1={50 + browDy} x2="86" y2={50 + browDy} transform={`rotate(${browL} 77 ${50 + browDy})`} />
+              <line x1="114" y1={50 + browDy} x2="132" y2={50 + browDy} transform={`rotate(${browR} 123 ${50 + browDy})`} />
             </g>
 
             {/* 眼睛 */}

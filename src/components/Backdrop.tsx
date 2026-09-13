@@ -11,7 +11,23 @@ type Props = {
   weather: 'sun' | 'rain' | 'snow' | null
 }
 
+/**
+ * 室内场地的窗口区域。天气**只**画在这里面。
+ *
+ * 第一版把雨云和雨点铺满整张舞台，于是卧室里下起了雨、灰色云层盖掉了半面墙。
+ * 天气在室内的正确表达是"从窗户看出去"——所以有窗的场地把天气裁进窗框，
+ * 没窗的场地（厨房、客厅）干脆不画天气。
+ */
+const WINDOW: Partial<Record<BackdropId, { x: number; y: number; w: number; h: number }>> = {
+  home: { x: 527, y: 93, w: 216, h: 162 },
+  bedroom: { x: 667, y: 87, w: 216, h: 166 },
+}
+
 export function Backdrop({ id, weather }: Props) {
+  const outdoor = id === 'meadow'
+  const win = WINDOW[id]
+  const showWeather = weather !== null && (outdoor || !!win)
+
   return (
     <svg className="backdrop" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs>
@@ -19,10 +35,15 @@ export function Backdrop({ id, weather }: Props) {
           <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="3" result="n" />
           <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G" />
         </filter>
+        {win && (
+          <clipPath id={`bd-win-${id}`}>
+            <rect x={win.x} y={win.y} width={win.w} height={win.h} />
+          </clipPath>
+        )}
       </defs>
 
       {/* 天空 / 墙面的底色随场地变 */}
-      <rect width="1000" height="620" fill={id === 'meadow' ? '#cfe6ef' : '#f2e6cd'} />
+      <rect width="1000" height="620" fill={outdoor ? '#cfe6ef' : '#f2e6cd'} />
 
       <g filter="url(#bd-crayon)">
         {id === 'meadow' && <Meadow />}
@@ -32,12 +53,18 @@ export function Backdrop({ id, weather }: Props) {
         {id === 'livingroom' && <LivingRoom />}
       </g>
 
-      {weather === 'sun' && <Sun />}
-      {weather === 'rain' && <Rain />}
-      {weather === 'snow' && <Snow />}
+      {showWeather && (
+        <g clipPath={win ? `url(#bd-win-${id})` : undefined}>
+          {weather === 'sun' && <Sun inWindow={!!win} win={win} />}
+          {weather === 'rain' && <Rain inWindow={!!win} win={win} />}
+          {weather === 'snow' && <Snow inWindow={!!win} win={win} />}
+        </g>
+      )}
     </svg>
   )
 }
+
+type Frame = { x: number; y: number; w: number; h: number } | undefined
 
 function Meadow() {
   return (
@@ -132,28 +159,32 @@ function LivingRoom() {
         <circle cx="445" cy="150" r="28" fill="#c1854a" />
         <circle cx="500" cy="160" r="20" fill="#d9a878" />
       </g>
-      {/* 落地灯 */}
-      <path d="M880 440 L880 250" stroke="#2e2a26" strokeWidth="8" strokeLinecap="round" />
-      <path d="M840 250 L920 250 L905 190 L855 190 Z" fill="#e9a13b" stroke="#2e2a26" strokeWidth="6" strokeLinejoin="round" />
-      <path d="M845 445 Q880 432 915 445" stroke="#2e2a26" strokeWidth="8" strokeLinecap="round" fill="none" />
+      {/* 落地灯。摆在 x≈330——右侧 36%–92% 是可操作物品的地面带，
+          原先放在 880 正好和"箱子"这件道具叠在一起 */}
+      <path d="M330 440 L330 250" stroke="#2e2a26" strokeWidth="8" strokeLinecap="round" />
+      <path d="M290 250 L370 250 L355 190 L305 190 Z" fill="#e9a13b" stroke="#2e2a26" strokeWidth="6" strokeLinejoin="round" />
+      <path d="M295 445 Q330 432 365 445" stroke="#2e2a26" strokeWidth="8" strokeLinecap="round" fill="none" />
     </>
   )
 }
 
-function Sun() {
+function Sun({ inWindow, win }: { inWindow: boolean; win: Frame }) {
+  const cx = inWindow && win ? win.x + win.w * 0.72 : 870
+  const cy = inWindow && win ? win.y + win.h * 0.28 : 105
+  const r = inWindow ? 30 : 52
   return (
-    <g className="bd-sun">
-      <circle cx="870" cy="105" r="52" fill="#e9a13b" stroke="#2e2a26" strokeWidth="6" />
-      <g stroke="#e9a13b" strokeWidth="9" strokeLinecap="round">
+    <g className="bd-sun" style={{ transformOrigin: `${cx}px ${cy}px` }}>
+      <circle cx={cx} cy={cy} r={r} fill="#e9a13b" stroke="#2e2a26" strokeWidth={inWindow ? 4 : 6} />
+      <g stroke="#e9a13b" strokeWidth={inWindow ? 6 : 9} strokeLinecap="round">
         {Array.from({ length: 8 }, (_, i) => {
           const a = (i * Math.PI) / 4
           return (
             <line
               key={i}
-              x1={870 + Math.cos(a) * 66}
-              y1={105 + Math.sin(a) * 66}
-              x2={870 + Math.cos(a) * 88}
-              y2={105 + Math.sin(a) * 88}
+              x1={cx + Math.cos(a) * (r * 1.27)}
+              y1={cy + Math.sin(a) * (r * 1.27)}
+              x2={cx + Math.cos(a) * (r * 1.69)}
+              y2={cy + Math.sin(a) * (r * 1.69)}
             />
           )
         })}
@@ -162,26 +193,39 @@ function Sun() {
   )
 }
 
-function Rain() {
+/** 天气图层在窗内时以窗框为画布，在室外时铺满舞台上半部。 */
+function frameOf(inWindow: boolean, win: Frame) {
+  return inWindow && win ? win : { x: 0, y: 0, w: 1000, h: 420 }
+}
+
+function Rain({ inWindow, win }: { inWindow: boolean; win: Frame }) {
+  const f = frameOf(inWindow, win)
   // 雨滴位置用确定值而非 random，避免每次 render 雨点乱跳
-  const drops = Array.from({ length: 26 }, (_, i) => ({
-    x: ((i * 137) % 1000) + 10,
-    y: ((i * 83) % 420) + 10,
+  const n = inWindow ? 14 : 26
+  const drops = Array.from({ length: n }, (_, i) => ({
+    x: f.x + ((i * 137) % f.w),
+    y: f.y + ((i * 83) % f.h),
     d: (i % 5) * 0.24,
   }))
+  const len = inWindow ? 12 : 22
   return (
-    <g className="bd-rain">
-      <path d="M-20 60 q120 -46 240 -6 q120 40 240 0 q120 -40 240 4 q120 44 320 -10 L1020 200 L-20 200 Z" fill="#b9c4cc" opacity="0.9" />
+    <g className="bd-rain" style={{ ['--fall' as string]: `${f.h * 0.9}px` }}>
+      {/* 云层：室内只占窗口顶部一条，不再是盖住半面墙的灰板 */}
+      <path
+        d={`M${f.x - 20} ${f.y + f.h * 0.12} q${f.w * 0.12} -${f.h * 0.13} ${f.w * 0.24} -0.02 q${f.w * 0.12} ${f.h * 0.11} ${f.w * 0.24} 0 q${f.w * 0.12} -${f.h * 0.11} ${f.w * 0.24} 0.01 q${f.w * 0.12} ${f.h * 0.12} ${f.w * 0.32} -${f.h * 0.03} L${f.x + f.w + 20} ${f.y + f.h * 0.34} L${f.x - 20} ${f.y + f.h * 0.34} Z`}
+        fill="#b9c4cc"
+        opacity="0.9"
+      />
       {drops.map((d, i) => (
         <line
           key={i}
           className="bd-raindrop"
           x1={d.x}
           y1={d.y}
-          x2={d.x - 7}
-          y2={d.y + 22}
+          x2={d.x - len * 0.32}
+          y2={d.y + len}
           stroke="#5b8fae"
-          strokeWidth="4"
+          strokeWidth={inWindow ? 3 : 4}
           strokeLinecap="round"
           style={{ animationDelay: `${d.d}s` }}
         />
@@ -190,17 +234,29 @@ function Rain() {
   )
 }
 
-function Snow() {
-  const flakes = Array.from({ length: 22 }, (_, i) => ({
-    x: ((i * 151) % 1000) + 12,
-    y: ((i * 97) % 400) + 12,
-    r: 4 + (i % 3) * 2,
+function Snow({ inWindow, win }: { inWindow: boolean; win: Frame }) {
+  const f = frameOf(inWindow, win)
+  const n = inWindow ? 12 : 22
+  const flakes = Array.from({ length: n }, (_, i) => ({
+    x: f.x + ((i * 151) % f.w),
+    y: f.y + ((i * 97) % f.h),
+    r: (inWindow ? 2.5 : 4) + (i % 3) * (inWindow ? 1 : 2),
     d: (i % 6) * 0.3,
   }))
   return (
-    <g className="bd-rain">
-      {flakes.map((f, i) => (
-        <circle key={i} className="bd-raindrop" cx={f.x} cy={f.y} r={f.r} fill="#fbf7ec" stroke="#b9c4cc" strokeWidth="2" style={{ animationDelay: `${f.d}s` }} />
+    <g className="bd-rain" style={{ ['--fall' as string]: `${f.h * 0.9}px` }}>
+      {flakes.map((f2, i) => (
+        <circle
+          key={i}
+          className="bd-raindrop"
+          cx={f2.x}
+          cy={f2.y}
+          r={f2.r}
+          fill="#fbf7ec"
+          stroke="#b9c4cc"
+          strokeWidth="2"
+          style={{ animationDelay: `${f2.d}s` }}
+        />
       ))}
     </g>
   )
