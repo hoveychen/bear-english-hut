@@ -45,19 +45,23 @@ export function StartGate({ onStart }: { onStart: () => void }) {
       <p className="gate__sub">听懂故事，帮小熊解决问题，然后说给他听。</p>
 
       <ul className="gate__notes">
+        {/* 每个 li 是两列 grid，所以正文必须裹在**一个**元素里——
+            直接放裸文本 + <strong>，strong 会变成第三个 grid item 被拆到下一行 */}
         <li>
           <span className="gate__icon" aria-hidden="true">
             <MicIcon size={22} />
           </span>
-          接下来会请求<strong>麦克风权限</strong>。孩子的话只在本机识别，不上传、不保存录音。
+          <span>
+            接下来会请求<strong>麦克风权限</strong>。孩子的话只在本机识别，不上传、不保存录音。
+          </span>
         </li>
         <li>
           <span className="gate__icon" aria-hidden="true">🔊</span>
-          请把音量打开，并戴好耳机或在安静的房间里玩 —— 环境噪音会明显影响识别。
+          <span>请把音量打开，并戴好耳机或在安静的房间里玩 —— 环境噪音会明显影响识别。</span>
         </li>
         <li>
           <span className="gate__icon" aria-hidden="true">👦</span>
-          没有分数、没有红叉。说不出来时小熊会示范，点一下画面故事就继续。
+          <span>没有分数、没有红叉。说不出来时小熊会示范，点一下画面故事就继续。</span>
         </li>
       </ul>
 

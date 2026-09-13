@@ -59,6 +59,19 @@ export function WaterBasin({ size = 120, className = '' }: ShapeProps) {
   )
 }
 
+/**
+ * 按内容层的 `drawn:<name>` 取到对应的手绘道具。
+ *
+ * 舞台和图片顺序卡都要用它——顺序卡最初只认图片文件 URL，结果"先洗苹果"
+ * 那张卡是空的，因为水盆根本没有素材文件。
+ */
+export function DrawnProp({ name, size }: { name: string; size?: number }) {
+  if (name === 'blanket') return <Blanket size={size ?? 150} />
+  if (name === 'basin') return <WaterBasin size={size ?? 130} />
+  if (name === 'table') return <Table size={size ?? 160} />
+  return null
+}
+
 /* ── 贴纸 ───────────────────────────────────────────────
  * 每完成一个故事，孩子在"冒险地图"上贴一张。这是产品的记忆点（设计文档 §7），
  * 所以三张都单独画，不做成同一个模板换个图标。

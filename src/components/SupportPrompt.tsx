@@ -1,4 +1,5 @@
-import { artUrl } from './objectArt'
+import { DrawnProp } from './HandDrawn'
+import { resolveArt } from './objectArt'
 import './SupportPrompt.css'
 
 /**
@@ -11,6 +12,7 @@ import './SupportPrompt.css'
  */
 
 type Props = {
+  /** 物品 id 序列。既可以是 OpenMoji 素材名，也可以是 `drawn:` 手绘道具。 */
   cards: string[]
   /** 再听一遍句首示范 */
   onReplayStarter: () => void
@@ -22,7 +24,7 @@ export function SupportPrompt({ cards, onReplayStarter }: Props) {
   return (
     <div className="support" role="group" aria-label="picture-order-cards">
       {cards.map((id, i) => {
-        const url = artUrl(id)
+        const art = resolveArt(id)
         return (
           <div className="support__slot" key={`${id}-${i}`}>
             <div className="support__card" style={{ ['--tilt' as string]: `${(i % 2 === 0 ? -1 : 1) * (2 + (i % 3))}deg` }}>
@@ -32,7 +34,13 @@ export function SupportPrompt({ cards, onReplayStarter }: Props) {
                   <i key={k} />
                 ))}
               </span>
-              {url ? <img src={url} alt="" draggable={false} /> : <span className="support__blank" />}
+              {art.kind === 'image' && <img src={art.url} alt="" draggable={false} />}
+              {art.kind === 'drawn' && (
+                <span className="support__drawn">
+                  <DrawnProp name={art.name} size={54} />
+                </span>
+              )}
+              {art.kind === 'missing' && <span className="support__blank" />}
             </div>
 
             {i < cards.length - 1 && (

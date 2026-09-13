@@ -36,6 +36,13 @@
   object-fit: contain;
 }
 
+.support__drawn {
+  display: grid;
+  place-items: center;
+  width: 70%;
+  height: 70%;
+}
+
 .support__blank {
   width: 40%;
   height: 40%;

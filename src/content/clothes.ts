@@ -29,11 +29,11 @@ export const clothes: Scene = {
       requireSelection: 1,
       skill: 'describe',
       objects: [
-        { id: 'coat', art: 'coat', x: 22, y: 62, correct: true },
-        { id: 'boots', art: 'boots', x: 41, y: 70, correct: true },
-        { id: 'sunglasses', art: 'sunglasses', x: 60, y: 62, correct: false },
-        { id: 'shorts', art: 'shorts', x: 78, y: 70, correct: false },
-        { id: 'rain', art: 'rain', x: 88, y: 24, scale: 1.2 },
+        { id: 'coat', art: 'coat', x: 40, y: 68, correct: true },
+        { id: 'boots', art: 'boots', x: 54, y: 78, correct: true },
+        { id: 'sunglasses', art: 'sunglasses', x: 68, y: 68, correct: false },
+        { id: 'shorts', art: 'shorts', x: 81, y: 78, correct: false },
+        { id: 'rain', art: 'rain', x: 90, y: 20, scale: 1.2 },
       ],
       targetIntents: [
         {
@@ -100,8 +100,8 @@ export const clothes: Scene = {
       promptLine: 'Why is the coat a good choice today?',
       skill: 'reason',
       objects: [
-        { id: 'rain', art: 'rain', x: 30, y: 30, scale: 1.3 },
-        { id: 'coat', art: 'coat', x: 62, y: 62, correct: true },
+        { id: 'rain', art: 'rain', x: 62, y: 24, scale: 1.3 },
+        { id: 'coat', art: 'coat', x: 64, y: 72, correct: true },
       ],
       targetIntents: [
         {
@@ -147,8 +147,8 @@ export const clothes: Scene = {
       promptLine: 'Can I try it on now? Ask me nicely and I will put it on.',
       skill: 'request',
       objects: [
-        { id: 'coat', art: 'coat', x: 34, y: 64, correct: true },
-        { id: 'hat', art: 'hat', x: 62, y: 62, correct: true },
+        { id: 'coat', art: 'coat', x: 50, y: 71, correct: true },
+        { id: 'hat', art: 'hat', x: 72, y: 71, correct: true },
       ],
       targetIntents: [
         {
@@ -196,8 +196,8 @@ export const clothes: Scene = {
       teacherModel: 'You can say: This one is too small.',
       skill: 'describe',
       objects: [
-        { id: 'coat', art: 'coat', x: 34, y: 64, correct: true, scale: 0.62 },
-        { id: 'tshirt', art: 'tshirt', x: 66, y: 66, correct: false },
+        { id: 'coat', art: 'coat', x: 50, y: 71, correct: true, scale: 0.62 },
+        { id: 'tshirt', art: 'tshirt', x: 74, y: 73, correct: false },
       ],
       targetIntents: [
         {
@@ -267,11 +267,11 @@ export const clothes: Scene = {
       promptLine: 'Here are my other clothes. What else can I wear in the rain?',
       skill: 'predict',
       objects: [
-        { id: 'hat', art: 'hat', x: 20, y: 62, correct: true },
-        { id: 'boots', art: 'boots', x: 38, y: 70, correct: true },
-        { id: 'scarf', art: 'scarf', x: 56, y: 62, correct: true },
-        { id: 'umbrella', art: 'umbrella', x: 74, y: 68, correct: true },
-        { id: 'socks', art: 'socks', x: 88, y: 62, correct: false },
+        { id: 'hat', art: 'hat', x: 38, y: 68, correct: true },
+        { id: 'boots', art: 'boots', x: 51, y: 78, correct: true },
+        { id: 'scarf', art: 'scarf', x: 64, y: 68, correct: true },
+        { id: 'umbrella', art: 'umbrella', x: 77, y: 78, correct: true },
+        { id: 'socks', art: 'socks', x: 90, y: 68, correct: false },
       ],
       targetIntents: [
         {

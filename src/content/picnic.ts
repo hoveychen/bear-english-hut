@@ -30,11 +30,11 @@ export const picnic: Scene = {
       requireSelection: 1,
       skill: 'request',
       objects: [
-        { id: 'apple', art: 'apple', x: 22, y: 62, correct: true },
-        { id: 'banana', art: 'banana', x: 40, y: 70, correct: true },
-        { id: 'cookie', art: 'cookie', x: 58, y: 63, correct: true },
-        { id: 'boots', art: 'boots', x: 76, y: 71, correct: false },
-        { id: 'basket', art: 'basket', x: 88, y: 55, scale: 1.25 },
+        { id: 'apple', art: 'apple', x: 40, y: 70, correct: true },
+        { id: 'banana', art: 'banana', x: 53, y: 77, correct: true },
+        { id: 'cookie', art: 'cookie', x: 66, y: 70, correct: true },
+        { id: 'boots', art: 'boots', x: 79, y: 77, correct: false },
+        { id: 'basket', art: 'basket', x: 91, y: 66, scale: 1.25 },
       ],
       targetIntents: [
         {
@@ -104,11 +104,11 @@ export const picnic: Scene = {
       requireSelection: 1,
       skill: 'request',
       objects: [
-        { id: 'cup', art: 'cup', x: 24, y: 64, correct: true },
-        { id: 'blanket', art: 'drawn:blanket', x: 45, y: 70, correct: true, scale: 1.1 },
-        { id: 'sunglasses', art: 'sunglasses', x: 66, y: 62, correct: false },
-        { id: 'ball', art: 'ball', x: 80, y: 72, correct: false },
-        { id: 'basket', art: 'basket', x: 90, y: 54, scale: 1.25 },
+        { id: 'cup', art: 'cup', x: 40, y: 70, correct: true },
+        { id: 'blanket', art: 'drawn:blanket', x: 54, y: 78, correct: true, scale: 1.1 },
+        { id: 'sunglasses', art: 'sunglasses', x: 68, y: 70, correct: false },
+        { id: 'ball', art: 'ball', x: 80, y: 77, correct: false },
+        { id: 'basket', art: 'basket', x: 91, y: 66, scale: 1.25 },
       ],
       targetIntents: [
         {
@@ -180,9 +180,9 @@ export const picnic: Scene = {
       teacherModel: 'First we wash the apple, then we put it in the basket.',
       skill: 'sequence',
       objects: [
-        { id: 'basin', art: 'drawn:basin', x: 28, y: 66, correct: true, scale: 1.1 },
-        { id: 'apple', art: 'apple', x: 50, y: 60, correct: true },
-        { id: 'basket', art: 'basket', x: 74, y: 66, correct: true, scale: 1.25 },
+        { id: 'basin', art: 'drawn:basin', x: 43, y: 73, correct: true, scale: 1.1 },
+        { id: 'apple', art: 'apple', x: 62, y: 68, correct: true },
+        { id: 'basket', art: 'basket', x: 82, y: 74, correct: true, scale: 1.25 },
       ],
       targetIntents: [
         {
@@ -246,10 +246,10 @@ export const picnic: Scene = {
       promptLine: 'Oh no! Look at the sky. It is raining! What do we need now?',
       skill: 'predict',
       objects: [
-        { id: 'umbrella', art: 'umbrella', x: 30, y: 64, correct: true },
-        { id: 'coat', art: 'coat', x: 50, y: 68, correct: true },
-        { id: 'flower', art: 'flower', x: 70, y: 64, correct: false },
-        { id: 'basket', art: 'basket', x: 86, y: 58, scale: 1.2 },
+        { id: 'umbrella', art: 'umbrella', x: 42, y: 70, correct: true },
+        { id: 'coat', art: 'coat', x: 58, y: 77, correct: true },
+        { id: 'flower', art: 'flower', x: 74, y: 70, correct: false },
+        { id: 'basket', art: 'basket', x: 90, y: 66, scale: 1.2 },
       ],
       targetIntents: [
         {
@@ -323,10 +323,10 @@ export const picnic: Scene = {
       promptLine: 'We are ready! Can you tell me what is in our basket?',
       skill: 'retell',
       objects: [
-        { id: 'apple', art: 'apple', x: 26, y: 64 },
-        { id: 'cup', art: 'cup', x: 44, y: 68 },
-        { id: 'blanket', art: 'drawn:blanket', x: 62, y: 70, scale: 0.9 },
-        { id: 'umbrella', art: 'umbrella', x: 80, y: 64 },
+        { id: 'apple', art: 'apple', x: 40, y: 70 },
+        { id: 'cup', art: 'cup', x: 54, y: 77 },
+        { id: 'blanket', art: 'drawn:blanket', x: 69, y: 79, scale: 0.9 },
+        { id: 'umbrella', art: 'umbrella', x: 85, y: 70 },
       ],
       targetIntents: [
         {

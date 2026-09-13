@@ -44,24 +44,31 @@ const EYES: Record<BearMood, { rx: number; ry: number; shine: boolean; closed?: 
 
 /** 眉毛：两条短线的 [左眉旋转, 右眉旋转, 垂直偏移]。 */
 const BROWS: Record<BearMood, [number, number, number]> = {
-  neutral: [0, 0, 0],
+  // 正值 = 内侧眉梢下压（担忧/生气），负值 = 内侧眉梢上扬（期待/好奇）。
+  // 只有 sad 该是内侧下压；其余全部上扬，否则小熊全程一脸发愁。
+  neutral: [-2, 2, -2],
   happy: [-6, 6, -2],
   confused: [-20, 6, -3],
   surprised: [-8, 8, -7],
-  waiting: [4, -4, -1],
+  waiting: [-3, 3, -3],
   thinking: [-14, 2, -2],
   sad: [16, -16, 2],
   talking: [-4, 4, -1],
 }
 
-/** 嘴：一条路径。绘本里嘴是最会说话的一笔。 */
+/**
+ * 嘴：一条路径。绘本里嘴是最会说话的一笔。
+ *
+ * SVG 的 y 轴朝下，所以控制点要比两端**大**才是笑（中间往下鼓）。
+ * 写反就成了撇嘴——只有 sad 该是反的。
+ */
 const MOUTHS: Record<BearMood, string> = {
   neutral: 'M88 116 Q100 123 112 116',
   happy: 'M84 113 Q100 132 116 113',
   confused: 'M88 120 Q95 113 101 119 Q107 125 113 117',
   surprised: 'M100 120 m-9 0 a9 11 0 1 0 18 0 a9 11 0 1 0 -18 0',
   waiting: 'M90 118 Q100 121 110 118',
-  thinking: 'M89 119 Q99 115 110 120',
+  thinking: 'M89 117 Q99 121 110 119',
   sad: 'M87 124 Q100 112 113 124',
   talking: 'M89 114 Q100 128 111 114 Q100 121 89 114',
 }
@@ -181,12 +188,14 @@ export function Bear({
           </g>
         </g>
 
-        {/* 思考时头顶冒问号，替代文字提示（孩子端无文字） */}
+        {/* 思考时头顶冒问号，替代文字提示（孩子端无文字）。
+            整组保持在 viewBox 内：问号原先画到了 y<0，被舞台裁掉了半个 */}
         {(mood === 'thinking' || mood === 'confused') && (
           <g className="bear__think">
-            <circle cx="156" cy="26" r="4" fill="none" stroke="#235a79" strokeWidth="3" />
-            <circle cx="168" cy="14" r="6" fill="none" stroke="#235a79" strokeWidth="3" />
-            <path d="M175 -4 q7 -6 12 1 q4 6 -5 10 v5" fill="none" stroke="#235a79" strokeWidth="3.4" strokeLinecap="round" />
+            <circle cx="158" cy="44" r="4" fill="none" stroke="#235a79" strokeWidth="3" />
+            <circle cx="170" cy="31" r="6" fill="none" stroke="#235a79" strokeWidth="3" />
+            <path d="M178 14 q8 -7 14 1 q4 7 -6 12 v5" fill="none" stroke="#235a79" strokeWidth="3.6" strokeLinecap="round" />
+            <circle cx="186" cy="38" r="2.2" fill="#235a79" />
           </g>
         )}
       </g>

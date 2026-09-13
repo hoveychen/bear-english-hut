@@ -64,11 +64,11 @@ function Home() {
       {/* 墙裙 */}
       <rect y="410" width="1000" height="40" fill="#d6c39c" />
       <rect y="450" width="1000" height="200" fill="#c9a878" />
-      {/* 窗 */}
+      {/* 窗。故意往左让开右上角——那里是太阳/雨云的固定位置，压上去两个图形会糊成一团 */}
       <g>
-        <rect x="620" y="70" width="250" height="190" rx="8" fill="#bfe0ea" stroke="#2e2a26" strokeWidth="7" />
-        <path d="M745 70 L745 260 M620 165 L870 165" stroke="#2e2a26" strokeWidth="6" />
-        <path d="M600 260 L890 260" stroke="#a86e38" strokeWidth="12" strokeLinecap="round" />
+        <rect x="520" y="86" width="230" height="176" rx="8" fill="#bfe0ea" stroke="#2e2a26" strokeWidth="7" />
+        <path d="M635 86 L635 262 M520 174 L750 174" stroke="#2e2a26" strokeWidth="6" />
+        <path d="M502 262 L768 262" stroke="#a86e38" strokeWidth="12" strokeLinecap="round" />
       </g>
       {/* 门 */}
       <rect x="100" y="130" width="160" height="320" rx="6" fill="#b5793f" stroke="#2e2a26" strokeWidth="7" />

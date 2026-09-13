@@ -36,8 +36,16 @@ const SKILL_PATTERN: Record<SkillTag, string> = {
 export type Observation = {
   key: string
   label: string
-  /** yes = 稳定做到，partial = 在支架帮助下做到，no = 本次没有出现 */
+  /** 只决定图标与配色：yes = 好，partial = 居中，no = 待观察 */
   state: 'yes' | 'partial' | 'no'
+  /**
+   * 这一行的结论文字。
+   *
+   * 不能由 state 统一推出来，因为"是否需要支架"这一行的**极性是反的**：
+   * 少用支架才是好。用同一套 yes→「做到了」的映射，会让"用了 4 次完整示范"
+   * 显示成「本次未出现」，正好说反。
+   */
+  stateText: string
   detail: string
 }
 
@@ -112,56 +120,82 @@ export function buildSceneReport(sceneId: string): SceneReport | null {
     ),
   ]
 
+  const core = completedSkills.filter((s) => s === 'position' || s === 'sequence' || s === 'reason')
+
+  /** 正向行的统一说法：做到 / 在帮助下做到 / 本次未出现。 */
+  const say = (state: Observation['state']) =>
+    state === 'yes' ? '做到了' : state === 'partial' ? '在帮助下做到' : '本次未出现'
+
+  const spokeState: Observation['state'] =
+    spokeCount >= attempts.length * 0.7 ? 'yes' : spokeCount > 0 ? 'partial' : 'no'
+
+  // matched 为 0 时必须是 no。写成 `independent + withStarter >= matched.length * 0.6`
+  // 会在一次都没说出来时算出 0 >= 0 = true，报成「做到了」——正好把最需要
+  // 家长注意的一次说成了最好的一次。
+  const understandState: Observation['state'] =
+    matched.length === 0 ? 'no' : independent + withStarter >= matched.length * 0.6 ? 'yes' : 'partial'
+
+  const sentenceState: Observation['state'] = fullSentences >= 3 ? 'yes' : fullSentences > 0 ? 'partial' : 'no'
+  const structureState: Observation['state'] = core.length >= 2 ? 'yes' : core.length === 1 ? 'partial' : 'no'
+  const transferState: Observation['state'] =
+    transferred.length >= 2 ? 'yes' : transferred.length === 1 ? 'partial' : 'no'
+  const streakState: Observation['state'] = longestUtterance >= 10 ? 'yes' : longestUtterance >= 6 ? 'partial' : 'no'
+
+  // 极性相反的一行：支架用得**少**才是好
+  const supportState: Observation['state'] =
+    withFullModel === 0 && withStarter === 0 ? 'yes' : withFullModel <= 1 ? 'partial' : 'no'
+
   const observations: Observation[] = [
     {
       key: 'spoke',
       label: '是否主动开口',
-      state: spokeCount >= attempts.length * 0.7 ? 'yes' : spokeCount > 0 ? 'partial' : 'no',
+      state: spokeState,
+      stateText: say(spokeState),
       detail: `${attempts.length} 次邀请里开口 ${spokeCount} 次`,
     },
     {
       key: 'understand',
       label: '是否能听懂任务',
-      state: independent + withStarter >= matched.length * 0.6 ? 'yes' : matched.length > 0 ? 'partial' : 'no',
+      state: understandState,
+      stateText: say(understandState),
       detail: matched.length > 0 ? `${matched.length} 次说出了目标表达` : '本次都借助了完整示范',
     },
     {
       key: 'sentence',
       label: '是否能用完整句回应',
-      state: fullSentences >= 3 ? 'yes' : fullSentences > 0 ? 'partial' : 'no',
+      state: sentenceState,
+      stateText: say(sentenceState),
       detail: `完整句 ${fullSentences} 次`,
     },
     {
       key: 'structure',
       label: '是否能描述位置、顺序和原因',
-      state: (() => {
-        const core = completedSkills.filter((s) => s === 'position' || s === 'sequence' || s === 'reason')
-        return core.length >= 2 ? 'yes' : core.length === 1 ? 'partial' : 'no'
-      })(),
-      detail:
-        completedSkills
-          .filter((s) => s === 'position' || s === 'sequence' || s === 'reason')
-          .map((s) => SKILL_LABEL[s])
-          .join('、') || '本次未出现',
+      state: structureState,
+      stateText: say(structureState),
+      detail: core.map((s) => SKILL_LABEL[s]).join('、') || '本次未出现',
     },
     {
       key: 'transfer',
       label: '是否能在新场景迁移表达',
-      state: transferred.length >= 2 ? 'yes' : transferred.length === 1 ? 'partial' : 'no',
-      detail: transferred.length ? `${transferred.map((s) => SKILL_LABEL[s]).join('、')} 在别的故事里也用出来了` : '还需要更多故事来观察',
+      state: transferState,
+      stateText: say(transferState),
+      detail: transferred.length
+        ? `${transferred.map((s) => SKILL_LABEL[s]).join('、')} 在别的故事里也用出来了`
+        : '还需要更多故事来观察',
     },
     {
       key: 'support',
       label: '是否需要示范、句首或图片支架',
-      // 这一项的"好"是**少**用支架，所以状态要反过来读
-      state: withFullModel === 0 && withStarter === 0 ? 'yes' : withFullModel <= 1 ? 'partial' : 'no',
+      state: supportState,
+      stateText: supportState === 'yes' ? '这次没用上' : supportState === 'partial' ? '偶尔需要' : '这次比较依赖',
       detail: `句首支架 ${withStarter} 次，完整示范 ${withFullModel} 次`,
     },
     {
       key: 'streak',
       label: '是否能连续说两到四句',
+      state: streakState,
+      stateText: say(streakState),
       // 6 个英文词大致是一个完整句的长度；10 词以上基本是两句连说
-      state: longestUtterance >= 10 ? 'yes' : longestUtterance >= 6 ? 'partial' : 'no',
       detail: longestUtterance > 0 ? `最长一次说了 ${longestUtterance} 个英文词` : '本次没有记录到英文表达',
     },
   ]

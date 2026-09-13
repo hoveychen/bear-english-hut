@@ -1,11 +1,11 @@
-import { test } from 'node:test'
+import { test } from 'vitest'
 import assert from 'node:assert/strict'
 
-import { matchIntents, normalize, hasContent } from './intentMatcher.ts'
-import { picnic } from '../content/picnic.ts'
-import { clothes } from '../content/clothes.ts'
-import { ball } from '../content/ball.ts'
-import type { Beat, Intent, Scene } from '../content/types.ts'
+import { matchIntents, normalize, hasContent } from './intentMatcher'
+import { picnic } from '../content/picnic'
+import { clothes } from '../content/clothes'
+import { ball } from '../content/ball'
+import type { Beat, Intent, Scene } from '../content/types'
 
 /** 取某一拍的意图表。 */
 function beatOf(scene: Scene, id: string): Beat {

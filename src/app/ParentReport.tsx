@@ -14,9 +14,7 @@ import './ParentReport.css'
  * 第一版验证指标，所以家长看到的进展和团队要验证的是同一件事。
  */
 
-const STATE_TEXT = { yes: '做到了', partial: '在帮助下做到', no: '本次未出现' } as const
-
-function ObservationRow({ label, state, detail }: SceneReport['observations'][number]) {
+function ObservationRow({ label, state, stateText, detail }: SceneReport['observations'][number]) {
   return (
     <li className={`pr__obs pr__obs--${state}`}>
       <span className="pr__obsMark" aria-hidden="true">
@@ -35,7 +33,7 @@ function ObservationRow({ label, state, detail }: SceneReport['observations'][nu
         )}
       </span>
       <span className="pr__obsLabel">{label}</span>
-      <span className="pr__obsState">{STATE_TEXT[state]}</span>
+      <span className="pr__obsState">{stateText}</span>
       <span className="pr__obsDetail">{detail}</span>
     </li>
   )

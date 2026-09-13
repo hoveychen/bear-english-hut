@@ -1,6 +1,6 @@
 import { Backdrop } from './Backdrop'
 import { Bear } from './Bear'
-import { Blanket, Table, WaterBasin } from './HandDrawn'
+import { DrawnProp } from './HandDrawn'
 import { artUrl, resolveArt } from './objectArt'
 import type { MachineView } from '../state/useBeatMachine'
 import './StoryStage.css'
@@ -15,13 +15,6 @@ import './StoryStage.css'
 type Props = {
   view: MachineView
   onSelectObject: (id: string) => void
-}
-
-function DrawnProp({ name }: { name: string }) {
-  if (name === 'blanket') return <Blanket size={150} />
-  if (name === 'basin') return <WaterBasin size={130} />
-  if (name === 'table') return <Table size={160} />
-  return null
 }
 
 export function StoryStage({ view, onSelectObject }: Props) {

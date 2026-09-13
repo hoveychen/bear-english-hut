@@ -29,10 +29,10 @@ export const ball: Scene = {
       requireSelection: 1,
       skill: 'position',
       objects: [
-        { id: 'chair', art: 'chair', x: 22, y: 62, correct: true },
-        { id: 'couch', art: 'couch', x: 48, y: 66, correct: false },
-        { id: 'box', art: 'box', x: 72, y: 68, correct: false },
-        { id: 'ball', art: 'ball', x: 23, y: 76, hidden: true, scale: 0.8 },
+        { id: 'chair', art: 'chair', x: 41, y: 71, correct: true },
+        { id: 'couch', art: 'couch', x: 62, y: 73, correct: false },
+        { id: 'box', art: 'box', x: 83, y: 75, correct: false },
+        { id: 'ball', art: 'ball', x: 41, y: 81, hidden: true, scale: 0.8 },
       ],
       targetIntents: [
         {
@@ -103,10 +103,10 @@ export const ball: Scene = {
       promptLine: 'It rolled away! Look, now it is somewhere new. Where is the ball now?',
       skill: 'position',
       objects: [
-        { id: 'couch', art: 'couch', x: 30, y: 64, correct: true },
-        { id: 'ball', art: 'ball', x: 30, y: 54, scale: 0.75 },
-        { id: 'door', art: 'door', x: 62, y: 60, correct: false },
-        { id: 'tree', art: 'tree', x: 82, y: 62, correct: false },
+        { id: 'couch', art: 'couch', x: 46, y: 73, correct: true },
+        { id: 'ball', art: 'ball', x: 46, y: 61, scale: 0.75 },
+        { id: 'door', art: 'door', x: 68, y: 67, correct: false },
+        { id: 'tree', art: 'tree', x: 86, y: 69, correct: false },
       ],
       targetIntents: [
         {
@@ -171,9 +171,9 @@ export const ball: Scene = {
       promptLine: 'The dog is running with my ball! Where will it go next?',
       skill: 'predict',
       objects: [
-        { id: 'dog', art: 'dog', x: 34, y: 64, scale: 1.2 },
-        { id: 'box', art: 'box', x: 58, y: 68, correct: true },
-        { id: 'tree', art: 'tree', x: 80, y: 62, correct: true },
+        { id: 'dog', art: 'dog', x: 46, y: 73, scale: 1.2 },
+        { id: 'box', art: 'box', x: 68, y: 75, correct: true },
+        { id: 'tree', art: 'tree', x: 87, y: 69, correct: true },
       ],
       targetIntents: [
         {
@@ -222,9 +222,9 @@ export const ball: Scene = {
       promptLine: 'There it is! Can you tell me where you found my ball?',
       skill: 'position',
       objects: [
-        { id: 'box', art: 'box', x: 40, y: 66, correct: true },
-        { id: 'ball', art: 'ball', x: 40, y: 56, scale: 0.8 },
-        { id: 'dog', art: 'dog', x: 70, y: 64 },
+        { id: 'box', art: 'box', x: 52, y: 73, correct: true },
+        { id: 'ball', art: 'ball', x: 52, y: 61, scale: 0.8 },
+        { id: 'dog', art: 'dog', x: 78, y: 73 },
       ],
       targetIntents: [
         {
@@ -269,10 +269,10 @@ export const ball: Scene = {
       teacherModel: 'First it was under the chair. Then it went behind the sofa. Then the dog put it in the box.',
       skill: 'retell',
       objects: [
-        { id: 'chair', art: 'chair', x: 20, y: 64 },
-        { id: 'couch', art: 'couch', x: 44, y: 66 },
-        { id: 'dog', art: 'dog', x: 66, y: 64 },
-        { id: 'box', art: 'box', x: 86, y: 66 },
+        { id: 'chair', art: 'chair', x: 39, y: 71 },
+        { id: 'couch', art: 'couch', x: 55, y: 73 },
+        { id: 'dog', art: 'dog', x: 71, y: 73 },
+        { id: 'box', art: 'box', x: 87, y: 73 },
       ],
       targetIntents: [
         {

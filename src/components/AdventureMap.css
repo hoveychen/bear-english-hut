@@ -11,6 +11,7 @@
   filter: drop-shadow(0 8px 0 var(--paper-deep));
 }
 
+.map__slot,
 .map__sticker {
   position: absolute;
   transform: translate(-50%, -50%) rotate(var(--tilt, 0deg));
@@ -25,6 +26,19 @@
  * 冲过头、回弹、定住，最后抖一下纸面。一个五岁孩子认得出这个动作，
  * 因为她自己贴贴纸就是这样。
  */
+.map__slot {
+  transform: translate(-50%, -50%) rotate(var(--tilt, 0deg));
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  /* 空位轻轻呼吸，是"还有故事没讲"的唯一提示——没有文字，没有计数 */
+  animation: slot-breathe 3.6s var(--ease-soft) infinite;
+}
+@keyframes slot-breathe {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.95; }
+}
+
 .map__sticker.is-new {
   animation: sticker-stamp 620ms var(--ease-pop);
 }

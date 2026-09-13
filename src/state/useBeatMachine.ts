@@ -1,6 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import type { BackdropId, Beat, FollowUp, Intent, Scene, SkillTag, StageEffect, Support } from '../content/types'
+import type {
+  BackdropId,
+  Beat,
+  FollowUp,
+  Intent,
+  IntentLevel,
+  Scene,
+  SkillTag,
+  StageEffect,
+  Support,
+} from '../content/types'
 import type { BearAction, BearMood } from '../components/Bear'
 import { listenOnce, type ListenHandle, type ListenOutcome, isRecognitionSupported } from '../speech/recognition'
 import { cancelSpeech, speak, unlockSpeech } from '../speech/synthesis'
@@ -261,7 +271,7 @@ export function useBeatMachine(scene: Scene, onSceneComplete: () => void) {
   /* ── 判定与支架 ───────────────────────────────────────── */
 
   const logAttempt = useCallback(
-    (q: Question, level: Awaited<ReturnType<typeof matchIntents>>['level'], transcript: string, spoke: boolean) => {
+    (q: Question, level: IntentLevel | null, transcript: string, spoke: boolean) => {
       recordAttempt({
         sceneId: scene.id,
         beatId: beat?.id ?? q.id,
@@ -401,6 +411,9 @@ export function useBeatMachine(scene: Scene, onSceneComplete: () => void) {
     setPhase('listening')
     setMood('waiting')
     setInterim('')
+    // 孩子在"点一下继续"的状态下又决定开口了——把点击继续收回来，
+    // 否则她说完之后舞台还停在可点击继续的状态，会推进两次
+    setTapToContinue(false)
 
     listenRef.current = listenOnce(
       {
@@ -427,9 +440,12 @@ export function useBeatMachine(scene: Scene, onSceneComplete: () => void) {
     setPhase('prompt')
     await say(q.line, q.mood)
     if (!aliveRef.current) return
-    setPhase('invite')
+    // 如果这一拍还要求先点物品而孩子没点够，重听之后要回到 observe，
+    // 不能因为按了一下重播就把选物品这一步跳过去
+    const need = q.isFollowUp ? 0 : beat?.requireSelection ?? 0
+    setPhase(selected.length >= need ? 'invite' : 'observe')
     setMood('waiting')
-  }, [phase, question, say])
+  }, [beat, phase, question, say, selected])
 
   /** 点选舞台物品。 */
   const selectObject = useCallback(
