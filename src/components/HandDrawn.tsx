@@ -101,10 +101,18 @@ export function DrawnProp({ name, size }: { name: string; size?: number }) {
 
 /* ── 贴纸 ───────────────────────────────────────────────
  * 每完成一个故事，孩子在"冒险地图"上贴一张。这是产品的记忆点（设计文档 §7），
- * 所以六张都单独画，不做成同一个模板换个图标。
+ * 所以八张都单独画，不做成同一个模板换个图标。
  */
 
-export type StickerId = 'picnic' | 'raincoat' | 'ball' | 'breakfast' | 'toybox' | 'puppy'
+export type StickerId =
+  | 'picnic'
+  | 'raincoat'
+  | 'ball'
+  | 'breakfast'
+  | 'toybox'
+  | 'puppy'
+  | 'shopping'
+  | 'zoo'
 
 function StickerFrame({ children, tilt }: { children: React.ReactNode; tilt: number }) {
   return (
@@ -227,6 +235,57 @@ export function Sticker({ id, size = 120, className = '' }: ShapeProps & { id: S
           {/* 甩在盆外的尾巴 */}
           <path d="M95 78 q14 -7 12 -21" fill="none" stroke="#e8b96a" strokeWidth="7" strokeLinecap="round" />
           <path d="M95 78 q14 -7 12 -21" fill="none" stroke="#2e2a26" strokeWidth="2.2" strokeLinecap="round" opacity="0.5" />
+        </StickerFrame>
+      )}
+
+      {id === 'shopping' && (
+        <StickerFrame tilt={-6}>
+          {/* 装满的购物车：斜着的车斗 + 露出车沿的果蔬 */}
+          <path d="M14 34 L26 34 L36 76 L92 76" fill="none" stroke="#2e2a26" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M28 44 L98 44 L90 70 L34 70 Z" fill="#5b8fa8" stroke="#2e2a26" strokeWidth="3.4" strokeLinejoin="round" />
+          {/* 车斗的网格 */}
+          <g stroke="#2e2a26" strokeWidth="2" opacity="0.55">
+            <path d="M44 44 L41 70 M60 44 L58 70 M76 44 L75 70 M32 56 L94 56" />
+          </g>
+          {/* 露出来的果蔬 */}
+          <circle cx="44" cy="37" r="10" fill="#dc5b3c" stroke="#2e2a26" strokeWidth="2.8" />
+          <path d="M44 27 q4 -6 9 -4" fill="none" stroke="#4f8f55" strokeWidth="3" strokeLinecap="round" />
+          <circle cx="66" cy="34" r="9" fill="#e9a13b" stroke="#2e2a26" strokeWidth="2.8" />
+          <path d="M84 40 q-3 -14 5 -20 q7 6 3 20 Z" fill="#6fae6a" stroke="#2e2a26" strokeWidth="2.6" strokeLinejoin="round" />
+          {/* 轮子 */}
+          <circle cx="46" cy="88" r="8" fill="#fbf7ec" stroke="#2e2a26" strokeWidth="3.2" />
+          <circle cx="84" cy="88" r="8" fill="#fbf7ec" stroke="#2e2a26" strokeWidth="3.2" />
+        </StickerFrame>
+      )}
+
+      {id === 'zoo' && (
+        <StickerFrame tilt={5}>
+          {/* 长颈鹿从栅栏后探出头——脖子最有辨识度，一眼是动物园不是农场 */}
+          <path d="M18 96 Q60 90 102 96" fill="none" stroke="#589a57" strokeWidth="6" strokeLinecap="round" />
+          {/* 栅栏 */}
+          <g fill="#c98c4e" stroke="#2e2a26" strokeWidth="2.8" strokeLinejoin="round">
+            <path d="M20 70 l6 -8 l6 8 l0 24 l-12 0 Z" />
+            <path d="M38 71 l6 -8 l6 8 l0 23 l-12 0 Z" />
+            <path d="M56 69 l6 -8 l6 8 l0 25 l-12 0 Z" />
+            <path d="M74 71 l6 -8 l6 8 l0 23 l-12 0 Z" />
+            <path d="M92 70 l6 -8 l6 8 l0 24 l-12 0 Z" />
+          </g>
+          <path d="M16 76 Q60 72 104 78" fill="none" stroke="#a86e38" strokeWidth="5" strokeLinecap="round" />
+          {/* 长颈鹿 */}
+          <path d="M62 72 Q58 48 60 30" fill="none" stroke="#e9a13b" strokeWidth="13" strokeLinecap="round" />
+          <g fill="#c98c4e">
+            <circle cx="60" cy="40" r="4" />
+            <circle cx="61" cy="54" r="4" />
+            <circle cx="59" cy="66" r="3.6" />
+          </g>
+          <ellipse cx="66" cy="26" rx="15" ry="11" fill="#e9a13b" stroke="#2e2a26" strokeWidth="2.8" transform="rotate(-12 66 26)" />
+          <path d="M56 18 q-8 -4 -10 -11 q9 0 13 7 Z" fill="#e9a13b" stroke="#2e2a26" strokeWidth="2.4" strokeLinejoin="round" />
+          {/* 头顶两只小角 */}
+          <path d="M62 16 l-1 -8 M70 16 l2 -8" stroke="#2e2a26" strokeWidth="2.8" strokeLinecap="round" />
+          <circle cx="61" cy="9" r="2.6" fill="#c98c4e" stroke="#2e2a26" strokeWidth="2" />
+          <circle cx="72" cy="9" r="2.6" fill="#c98c4e" stroke="#2e2a26" strokeWidth="2" />
+          <circle cx="64" cy="23" r="2.2" fill="#2e2a26" />
+          <ellipse cx="77" cy="28" rx="4" ry="3" fill="#c98c4e" stroke="#2e2a26" strokeWidth="2" />
         </StickerFrame>
       )}
     </svg>
