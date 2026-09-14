@@ -36,6 +36,7 @@ const COVER: Record<string, string[]> = {
   // 封面走 artUrl（只认 objects 里的文件），认不了 drawn: 道具，所以积木上不了封面
   toybox: ['box', 'car', 'teddy'],
   puppy: ['dog', 'bathtub', 'soap'],
+  shopping: ['cart', 'tomato', 'cheese'],
 }
 
 export function HomeScreen({ earnedStickers, justEarned, onPickScene, onCeremonyDone, onOpenParent }: Props) {

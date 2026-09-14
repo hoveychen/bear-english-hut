@@ -5,6 +5,7 @@ import { ball } from './ball.ts'
 import { breakfast } from './breakfast.ts'
 import { toybox } from './toybox.ts'
 import { puppy } from './puppy.ts'
+import { shopping } from './shopping.ts'
 
 /**
  * 故事顺序即难度顺序：
@@ -19,7 +20,7 @@ import { puppy } from './puppy.ts'
  * 不认无扩展名导入。带上扩展名，场景清单才能只有这一份——先前 scripts/
  * 自己另抄了一份，加了新场景忘了同步，audio:verify 照样报 100%。
  */
-export const scenes: Scene[] = [picnic, clothes, ball, breakfast, toybox, puppy]
+export const scenes: Scene[] = [picnic, clothes, ball, breakfast, toybox, puppy, shopping]
 
 export function getScene(id: string): Scene | undefined {
   return scenes.find((s) => s.id === id)
