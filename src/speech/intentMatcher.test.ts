@@ -5,6 +5,10 @@ import { matchIntents, normalize, hasContent } from './intentMatcher'
 import { picnic } from '../content/picnic'
 import { clothes } from '../content/clothes'
 import { ball } from '../content/ball'
+import { breakfast } from '../content/breakfast'
+import { toybox } from '../content/toybox'
+import { puppy } from '../content/puppy'
+import { scenes } from '../content'
 import type { Beat, Intent, Scene } from '../content/types'
 
 /** 取某一拍的意图表。 */
@@ -127,8 +131,82 @@ test('hasContent 区分沉默与说了但没match', () => {
   assert.equal(hasContent('purple monkey'), true)
 })
 
+test('早餐 b3：关键词 / First-then 两步 / 完整顺序 三档递进', () => {
+  const it = beatOf(breakfast, 'b3_sequence').targetIntents
+  expectLevel(it, 'Cook.', 'basic')
+  expectLevel(it, 'the pan', 'basic')
+  expectLevel(it, 'First we cook it, then we eat.', 'target')
+  expectLevel(it, 'we cook the egg then the plate', 'target')
+  expectLevel(it, 'First we cook the egg, then we put it on the plate.', 'challenge')
+})
+
+test('收玩具 b2：安置介词，说的是东西该去哪而不是在哪', () => {
+  const it = beatOf(toybox, 'b2_car_in_box').targetIntents
+  expectLevel(it, 'box', 'basic')
+  expectLevel(it, 'In the box.', 'target')
+  expectLevel(it, 'inside the box', 'target')
+  expectLevel(it, 'Put the car in the box, please.', 'challenge')
+  expectNoMatch(it, 'I want a cookie')
+})
+
+test('洗澡 b2：原因从一个词到带上地点', () => {
+  const it = beatOf(puppy, 'b2_why_wash').targetIntents
+  expectLevel(it, 'Dirty.', 'basic')
+  expectLevel(it, 'muddy', 'basic')
+  expectLevel(it, 'Because he is dirty.', 'target')
+  expectLevel(it, 'Because he is dirty. He played outside in the mud.', 'challenge')
+})
+
+test('洗澡 b4：预测下一步，he will shake 的几种说法都收', () => {
+  const it = beatOf(puppy, 'b4_what_next').targetIntents
+  expectLevel(it, 'Shake!', 'basic')
+  expectLevel(it, 'I think he will shake.', 'target')
+  expectLevel(it, 'he is going to run', 'target')
+  expectLevel(it, 'I think he will shake because he is wet.', 'challenge')
+})
+
+test('分档自洽：target / challenge 的示范句必须正好落在自己那一档', () => {
+  /*
+   * 为什么 basic 是例外：basic 的示范句往往也满足更高档（「Under the chair.」
+   * 既是 basic 的示范，也确实说出了介词短语），此时判 target 是**对的**——
+   * 系统对孩子宽容不是缺陷。
+   *
+   * 真正有害的是另外两个方向：
+   *   target 的示范被判成 challenge → 家长端把「能说完整句」虚报成挑战档；
+   *   challenge 的示范只判到 target → 孩子说到了却不算数。
+   * 两者都源于同一个写法：把三档的关键词写得互相包含。
+   */
+  for (const scene of scenes) {
+    for (const beat of scene.beats) {
+      const groups: Array<{ where: string; intents: Intent[] }> = [
+        { where: `${scene.id}/${beat.id}`, intents: beat.targetIntents },
+      ]
+      let fu = beat.followUp
+      let depth = 0
+      while (fu) {
+        groups.push({ where: `${scene.id}/${beat.id}/followUp#${depth}`, intents: fu.targetIntents })
+        fu = fu.followUp
+        depth++
+      }
+      for (const { where, intents } of groups) {
+        for (const intent of intents) {
+          if (intent.level === 'basic') continue
+          const r = matchIntents([intent.model], intents)
+          assert.equal(
+            r.level,
+            intent.level,
+            `${where} 的 ${intent.level} 示范「${intent.model}」被判成了 ${r.level}`,
+          )
+        }
+      }
+    }
+  }
+})
+
 test('每个节点的 basic 档都能被它自己的示范句命中', () => {
-  for (const scene of [picnic, clothes, ball]) {
+  // 遍历 scenes 而不是手写清单：这条扫描的价值全在「新加的场景也被扫到」，
+  // 而写死三个场景恰恰保证了新场景扫不到。
+  for (const scene of scenes) {
     for (const beat of scene.beats) {
       const checks: Array<{ where: string; intents: Intent[] }> = [
         { where: `${scene.id}/${beat.id}`, intents: beat.targetIntents },

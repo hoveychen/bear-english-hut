@@ -23,10 +23,19 @@ type Props = {
 }
 
 /** 每个故事的封面画：用故事里的三件道具摆一张小画。 */
+/*
+ * 每个故事封面摆三件道具。注意下面取值时用了 `?? []`——少一条不会报错，
+ * 只会安静地渲染成一张全白的卡片，所以**加场景就必须同时加这里**。
+ */
 const COVER: Record<string, string[]> = {
   picnic: ['basket', 'apple', 'umbrella'],
   clothes: ['coat', 'boots', 'rain'],
   ball: ['ball', 'dog', 'box'],
+  // pan 是一大块灰，摆在封面第一位会把整张卡压得发灰；bread 的暖黄撑得起来
+  breakfast: ['bread', 'egg', 'milk'],
+  // 封面走 artUrl（只认 objects 里的文件），认不了 drawn: 道具，所以积木上不了封面
+  toybox: ['box', 'car', 'teddy'],
+  puppy: ['dog', 'bathtub', 'soap'],
 }
 
 export function HomeScreen({ earnedStickers, justEarned, onPickScene, onCeremonyDone, onOpenParent }: Props) {

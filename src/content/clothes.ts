@@ -126,6 +126,9 @@ export const clothes: Scene = {
           keywords: [
             ['because', 'rain|raining|rainy', 'dry|wet|warm'],
             ['rainy', 'so', 'need|wear'],
+            // 少了这一组，challenge 自己的示范句「It is rainy, so the coat
+            // keeps me dry.」只会被记成 target——说到了却不算数。
+            ['rain|raining|rainy', 'so', 'dry|warm|keep|keeps'],
           ],
           model: 'It is rainy, so the coat keeps me dry.',
         },
@@ -166,7 +169,8 @@ export const clothes: Scene = {
             ['can', 'try'],
             ['please'],
           ],
-          model: 'Can I try it on, please?',
+          // please 是 challenge 那一档的要件，target 的示范不能先把它用掉
+          model: 'Can I try it on?',
         },
         {
           id: 'try_polite',

@@ -200,7 +200,9 @@ export const picnic: Scene = {
             ['wash', 'then'],
             ['wash', 'basket'],
           ],
-          model: 'First we wash the apple, then we put it in the basket.',
+          // 不与 challenge 共用同一句：challenge 要求说到 basket，所以 target
+          // 的示范停在两步本身，否则说出 target 示范的孩子会被记成挑战档。
+          model: 'First we wash the apple, then we dry it.',
         },
         {
           id: 'seq_full',
@@ -230,7 +232,7 @@ export const picnic: Scene = {
       },
       support: {
         level1: { line: 'First the water, then the basket. Can you tell me?', highlight: ['basin', 'basket'] },
-        level2: { line: 'Start like this.', starter: 'First we ...', pictureCards: ['basin', 'apple', 'basket'] },
+        level2: { line: 'Start like this.', starter: 'First we ...', pictureCards: ['drawn:basin', 'apple', 'basket'] },
         fallback: { line: 'First we wash the apple, then we put it in the basket.', allowTapToContinue: true },
       },
       successLine: 'Clean and packed! Our basket is ready.',
@@ -358,7 +360,7 @@ export const picnic: Scene = {
       ],
       support: {
         level1: { line: 'Look in the basket. What can you see?', highlight: ['apple', 'cup', 'blanket', 'umbrella'] },
-        level2: { line: 'Start like this.', starter: 'We have ...', pictureCards: ['apple', 'cup', 'blanket', 'umbrella'] },
+        level2: { line: 'Start like this.', starter: 'We have ...', pictureCards: ['apple', 'cup', 'drawn:blanket', 'umbrella'] },
         fallback: { line: 'We have an apple, a cup, a blanket and an umbrella!', allowTapToContinue: true },
       },
       successLine: 'You remembered everything!',
