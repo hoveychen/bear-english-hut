@@ -1,4 +1,6 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
+import { createPressToTalk, type PressAction } from './pressToTalk'
 
 import { MicIcon, ReplayIcon } from './HandDrawn'
 import type { Phase } from '../state/useBeatMachine'
@@ -62,39 +64,52 @@ export function SpeechButton({
    * 统一到按住这一边，而不是反过来改标签：对着 5 岁孩子，对讲机式的
    * "按着才录、松手就完"不需要她理解两次点击的含义不同。
    */
-  const holding = useRef(false)
+  /*
+   * 按压时序交给 pressToTalk 这台小状态机：按住说话（松手即停）和点一下说话
+   * （再点一下停）靠按压时长区分，那段判断和渲染无关，放在这里只会看不清。
+   */
+  const press = useRef(createPressToTalk())
+  const [tapMode, setTapMode] = useState(false)
+
+  // 一轮收听结束就复位，下一问重新从"按住"开始
+  useEffect(() => {
+    if (!listening) {
+      press.current.reset()
+      setTapMode(false)
+    }
+  }, [listening])
+
+  const apply = (action: PressAction) => {
+    if (action === 'start') onStart()
+    else if (action === 'stop') onStop()
+    setTapMode(press.current.isTapMode())
+  }
 
   const beginHold = (e: React.PointerEvent<HTMLButtonElement>) => {
-    if (!usable || listening) return
+    if (!usable) return
     // 捕获指针：手指按住后滑出按钮范围，松手时仍然收得到 pointerup，
     // 否则录音会一直开着，直到 9 秒上限才自己停
-    e.currentTarget.setPointerCapture?.(e.pointerId)
-    holding.current = true
-    onStart()
+    if (!listening) e.currentTarget.setPointerCapture?.(e.pointerId)
+    apply(press.current.down(listening))
   }
 
   const endHold = (e: React.PointerEvent<HTMLButtonElement>) => {
-    if (!holding.current) return
-    holding.current = false
     if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
       e.currentTarget.releasePointerCapture(e.pointerId)
     }
-    onStop()
+    apply(press.current.up())
   }
 
   /* 键盘等价：空格/回车按下开始、抬起结束。孩子不用键盘，但读屏用户要用。 */
   const keyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (e.key !== ' ' && e.key !== 'Enter') return
     e.preventDefault()
-    if (e.repeat || !usable || listening) return
-    holding.current = true
-    onStart()
+    if (e.repeat || !usable) return
+    apply(press.current.down(listening))
   }
   const keyUp = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (e.key !== ' ' && e.key !== 'Enter') return
-    if (!holding.current) return
-    holding.current = false
-    onStop()
+    apply(press.current.up())
   }
 
   return (
@@ -136,7 +151,9 @@ export function SpeechButton({
           // 麦克风用不了时降级成纯点选：这时它就是一颗"继续故事"的普通按钮
           onClick={usable ? undefined : onSkip}
           disabled={busy}
-          aria-label={listening ? '松开就说完了' : usable ? '按住说话' : '继续故事'}
+          aria-label={
+            listening ? (tapMode ? '点一下就说完了' : '松开就说完了') : usable ? '按住说话' : '继续故事'
+          }
         >
           <MicIcon size={58} />
         </button>
