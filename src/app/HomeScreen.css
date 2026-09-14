@@ -42,35 +42,92 @@
   min-height: 0;
   display: grid;
   place-items: center;
+  /* 供下面的 cqh 取到这一格的实际高度 */
+  container-type: size;
 }
 .home__map > * {
-  max-height: 100%;
-  max-width: min(100%, 900px);
+  /*
+   * 地图有固定的 aspect-ratio，宽高必须同时受限，否则总有一边溢出：
+   *   - 只给 width:100%：高度由比例推出来，会压到下面的故事卡上
+   *     （故事卡从一行变两行之后这一下就露馅了）；
+   *   - 改成 height:100% + width:auto + max-width：实测 max-width 拦不住
+   *     由 aspect-ratio 推出的宽度，390px 宽的手机上地图算出 682px，
+   *     右边两站直接被裁掉。
+   *
+   * 所以把三个上限写进同一个 min()：容器宽、900px、以及"容器高换算成的宽"。
+   * 高度再由 aspect-ratio 从宽度推回去，两边就都不会溢出。
+   */
+  width: min(100cqw, 900px, calc(100cqh * 1000 / 520));
+  height: auto;
 }
 
-/* ── 三个故事的封面 ─────────────────────────────────── */
+/* ── 故事封面 ───────────────────────────────────────── */
 
+/*
+ * 四列的网格，故事多了就往下换行。
+ *
+ * 原先是一行不换行的 flex：三张的时候很好看，八张就被 flex-shrink 压成一条
+ * 窄条，封面上那三件道具跟着缩到认不出来。改成固定四列之后，卡片回到它该有的
+ * 尺寸，加场景只是多一行——布局不再随数量退化。
+ */
 .home__scenes {
   flex: none;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 168px));
+  gap: clamp(10px, 1.8vw, 20px) clamp(12px, 2.4vw, 28px);
+  /*
+   * 居中必须靠 justify-content（让四列在容器里居中），**不能**用
+   * `margin: 0 auto` 或 `align-self: center`。
+   *
+   * .home 是 flex column，这一块是它的 flex item。在交叉轴（水平）上，
+   * auto margin 和 align-self 都会覆盖掉默认的 stretch，让这块退化成
+   * fit-content 宽度——而卡片内部全是 position:absolute 的封面画，
+   * fit-content 就是 0。实测过：容器会从 1060px 塌到 134px，四列各 12.5px，
+   * 八张卡在屏幕上就是八个小黑点。
+   */
   justify-content: center;
-  gap: clamp(12px, 3vw, 30px);
+  align-content: start;
   padding-top: 6px;
+}
+
+@media (max-width: 560px) {
+  /*
+   * 窄屏四列会把卡压得太细，但也别退到两列：两列意味着八张卡排四行，
+   * 而卡片区是 flex: none、地图是 flex: 1，多出来的高度全从地图身上扣——
+   * 实测 390px 宽时地图被压到只剩 80px，成了一条缝。三列排三行，地图就能
+   * 拿回它由宽度决定的正常高度（约 203px）。
+   */
+  .home__scenes { grid-template-columns: repeat(3, minmax(0, 168px)); }
 }
 
 .home__scene {
   position: relative;
-  width: clamp(104px, 24vw, 168px);
+  width: 100%;
+  max-width: 168px;
+  margin: 0 auto;
   aspect-ratio: 5 / 4;
   background: var(--paper-lit);
   border: var(--stroke-bold) solid var(--ink);
-  /* 三张封面用三个不同的手绘圆角，摆在一起才像三张纸而不是一组组件 */
+  /* 每张封面的手绘圆角和角度都不一样，摆在一起才像一叠纸而不是一组组件 */
   box-shadow: 0 6px 0 var(--paper-deep);
   transition: transform 180ms var(--ease-pop), box-shadow 180ms var(--ease-pop);
 }
-.home__scene:nth-child(1) { border-radius: var(--wobble-a); transform: rotate(-1.6deg); }
-.home__scene:nth-child(2) { border-radius: var(--wobble-b); transform: rotate(1deg); }
-.home__scene:nth-child(3) { border-radius: var(--wobble-c); transform: rotate(-0.6deg); }
+/*
+ * 圆角只有三种，所以按 3 循环取；角度则每张单列，八张不重样——
+ * 先前只写到 :nth-child(3)，于是第四张起既没有手绘圆角也没有角度，
+ * 在一排里就是几个方方正正的矩形。
+ */
+.home__scene:nth-child(3n + 1) { border-radius: var(--wobble-a); }
+.home__scene:nth-child(3n + 2) { border-radius: var(--wobble-b); }
+.home__scene:nth-child(3n)     { border-radius: var(--wobble-c); }
+.home__scene:nth-child(1) { transform: rotate(-1.6deg); }
+.home__scene:nth-child(2) { transform: rotate(1deg); }
+.home__scene:nth-child(3) { transform: rotate(-0.6deg); }
+.home__scene:nth-child(4) { transform: rotate(1.4deg); }
+.home__scene:nth-child(5) { transform: rotate(-1.1deg); }
+.home__scene:nth-child(6) { transform: rotate(0.7deg); }
+.home__scene:nth-child(7) { transform: rotate(-1.9deg); }
+.home__scene:nth-child(8) { transform: rotate(1.2deg); }
 
 .home__scene:hover:not(:disabled) {
   transform: translateY(-6px) rotate(0deg);
