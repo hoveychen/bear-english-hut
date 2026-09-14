@@ -74,10 +74,10 @@ export function DrawnProp({ name, size }: { name: string; size?: number }) {
 
 /* ── 贴纸 ───────────────────────────────────────────────
  * 每完成一个故事，孩子在"冒险地图"上贴一张。这是产品的记忆点（设计文档 §7），
- * 所以三张都单独画，不做成同一个模板换个图标。
+ * 所以六张都单独画，不做成同一个模板换个图标。
  */
 
-export type StickerId = 'picnic' | 'raincoat' | 'ball'
+export type StickerId = 'picnic' | 'raincoat' | 'ball' | 'breakfast' | 'toybox' | 'puppy'
 
 function StickerFrame({ children, tilt }: { children: React.ReactNode; tilt: number }) {
   return (
@@ -132,6 +132,74 @@ export function Sticker({ id, size = 120, className = '' }: ShapeProps & { id: S
           <path d="M38 46 Q60 58 82 46" fill="none" stroke="#fbf7ec" strokeWidth="5" strokeLinecap="round" />
           <path d="M42 62 Q60 70 78 62" fill="none" stroke="#fbf7ec" strokeWidth="4" strokeLinecap="round" />
           <circle cx="92" cy="62" r="5" fill="#e9a13b" stroke="#2e2a26" strokeWidth="2.5" />
+        </StickerFrame>
+      )}
+
+      {id === 'breakfast' && (
+        <StickerFrame tilt={4}>
+          {/* 一份摆好的早餐：盘子 + 煎蛋 + 立着的吐司，热气从蛋上直接升起来 */}
+          <g stroke="#c98c4e" strokeWidth="3.4" strokeLinecap="round" fill="none" opacity="0.75">
+            <path d="M44 44 q-7 -11 1 -21 M58 40 q-7 -12 1 -22" />
+          </g>
+          <ellipse cx="60" cy="84" rx="42" ry="19" fill="#fbf7ec" stroke="#2e2a26" strokeWidth="3.2" />
+          <ellipse cx="60" cy="79" rx="31" ry="12" fill="none" stroke="#d8cdb2" strokeWidth="2.5" />
+          {/* 煎蛋摊在盘子左半边 */}
+          <path d="M30 76 q-8 -15 7 -19 q7 -13 21 -6 q16 -4 16 11 q9 11 -6 16 q-20 8 -38 -2 Z" fill="#fdfaf2" stroke="#2e2a26" strokeWidth="2.8" strokeLinejoin="round" />
+          <circle cx="51" cy="71" r="8.5" fill="#e9a13b" stroke="#2e2a26" strokeWidth="2.4" />
+          {/* 吐司立在盘子右后方：带方肩和圆顶，一眼是面包片而不是方块 */}
+          <path d="M79 74 L79 52 q0 -9 9 -9 q3 -7 9 -2 q6 3 2 9 l0 24 q-10 4 -20 0 Z" fill="#e8b96a" stroke="#2e2a26" strokeWidth="2.8" strokeLinejoin="round" />
+          <path d="M83 60 q7 -3 13 0" fill="none" stroke="#c98c4e" strokeWidth="2.4" strokeLinecap="round" />
+        </StickerFrame>
+      )}
+
+      {id === 'toybox' && (
+        <StickerFrame tilt={-6}>
+          {/* 收拾好的玩具箱：盖子从后沿向上翻开，玩具从箱口冒出来 */}
+          {/* 箱身先画，箱口是一道敞开的椭圆——别让盖子看着像浮在半空 */}
+          <path d="M24 64 L30 100 Q60 110 90 100 L96 64 Z" fill="#c98c4e" stroke="#2e2a26" strokeWidth="3.2" strokeLinejoin="round" />
+          <ellipse cx="60" cy="64" rx="36" ry="11" fill="#8e5f2f" stroke="#2e2a26" strokeWidth="3.2" />
+          <path d="M60 76 L60 106" fill="none" stroke="#a86e38" strokeWidth="2.5" />
+          {/* 掀开的盖子：铰在箱子后沿，向左后方斜倒 */}
+          <path d="M26 62 L14 30 L52 22 L64 54 Z" fill="#d9c49a" stroke="#2e2a26" strokeWidth="3.2" strokeLinejoin="round" />
+          {/* 从箱口冒出来的积木与小熊 */}
+          <rect x="38" y="42" width="20" height="18" rx="2.5" fill="#dc5b3c" stroke="#2e2a26" strokeWidth="2.8" transform="rotate(-10 48 51)" />
+          <rect x="62" y="44" width="17" height="16" rx="2.5" fill="#5b8fa8" stroke="#2e2a26" strokeWidth="2.8" transform="rotate(12 70 52)" />
+          {/* 探出箱口的小熊头：两只耳朵才读得出是小熊，不是又一个球 */}
+          <circle cx="88" cy="46" r="12" fill="#e8b96a" stroke="#2e2a26" strokeWidth="2.8" />
+          <circle cx="80" cy="35" r="5" fill="#c98c4e" stroke="#2e2a26" strokeWidth="2.4" />
+          <circle cx="97" cy="37" r="5" fill="#c98c4e" stroke="#2e2a26" strokeWidth="2.4" />
+          <circle cx="84" cy="45" r="1.9" fill="#2e2a26" />
+          <circle cx="92" cy="45" r="1.9" fill="#2e2a26" />
+          <ellipse cx="88" cy="51" rx="3" ry="2.3" fill="#2e2a26" />
+        </StickerFrame>
+      )}
+
+      {id === 'puppy' && (
+        <StickerFrame tilt={7}>
+          {/* 澡盆里的小狗：一头泡泡，尾巴还在外面甩 */}
+          <g fill="#eaf4f8" stroke="#7fb8d0" strokeWidth="2.4">
+            <circle cx="34" cy="36" r="7" />
+            <circle cx="88" cy="32" r="5.5" />
+            <circle cx="72" cy="22" r="4.5" />
+          </g>
+          <path d="M20 60 Q60 51 100 60 L93 96 Q60 108 27 96 Z" fill="#cfe0e7" stroke="#2e2a26" strokeWidth="3.2" strokeLinejoin="round" />
+          {/* 盆沿那圈泡沫 */}
+          <g fill="#fbf7ec" stroke="#2e2a26" strokeWidth="2.4">
+            <circle cx="28" cy="60" r="8" />
+            <circle cx="46" cy="56" r="9" />
+            <circle cx="66" cy="56" r="8" />
+            <circle cx="86" cy="60" r="8" />
+          </g>
+          {/* 狗头从泡沫里探出来 */}
+          <ellipse cx="58" cy="40" rx="17" ry="14" fill="#e8b96a" stroke="#2e2a26" strokeWidth="3" />
+          <path d="M44 33 q-9 -10 -3 -17 q10 3 13 11 Z" fill="#c98c4e" stroke="#2e2a26" strokeWidth="2.6" strokeLinejoin="round" />
+          <path d="M72 33 q9 -10 3 -17 q-10 3 -13 11 Z" fill="#c98c4e" stroke="#2e2a26" strokeWidth="2.6" strokeLinejoin="round" />
+          <circle cx="52" cy="39" r="2.4" fill="#2e2a26" />
+          <circle cx="64" cy="39" r="2.4" fill="#2e2a26" />
+          <ellipse cx="58" cy="46" rx="3.8" ry="2.9" fill="#2e2a26" />
+          {/* 甩在盆外的尾巴 */}
+          <path d="M95 78 q14 -7 12 -21" fill="none" stroke="#e8b96a" strokeWidth="7" strokeLinecap="round" />
+          <path d="M95 78 q14 -7 12 -21" fill="none" stroke="#2e2a26" strokeWidth="2.2" strokeLinecap="round" opacity="0.5" />
         </StickerFrame>
       )}
     </svg>
