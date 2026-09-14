@@ -37,6 +37,7 @@ const COVER: Record<string, string[]> = {
   toybox: ['box', 'car', 'teddy'],
   puppy: ['dog', 'bathtub', 'soap'],
   shopping: ['cart', 'tomato', 'cheese'],
+  zoo: ['giraffe', 'elephant', 'monkey'],
 }
 
 export function HomeScreen({ earnedStickers, justEarned, onPickScene, onCeremonyDone, onOpenParent }: Props) {
