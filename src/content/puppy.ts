@@ -246,9 +246,14 @@ export const puppy: Scene = {
         {
           id: 'next_full',
           level: 'challenge',
+          // challenge 必须比 target 真的更难：第一版写成
+          // ['think','he will|hell','shake|run|jump']，而那正好就是 target
+          // 的说法，于是「I think he will shake.」被判成了 challenge，
+          // 家长端会把"能说完整句"错报成"能说出挑战级表达"。挑战档要带上原因。
           keywords: [
-            ['think', 'he will|hell|going to|gonna', 'shake|run|jump'],
-            ['shake', 'because|wet|water'],
+            ['think', 'he will|hell|going to|gonna', 'shake|run|jump', 'because|wet|water'],
+            ['shake|run|jump', 'because'],
+            ['shake|run|jump', 'wet|water'],
           ],
           model: 'I think he will shake because he is wet.',
         },

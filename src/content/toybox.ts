@@ -114,7 +114,9 @@ export const toybox: Scene = {
           id: 'in_word',
           level: 'basic',
           keywords: [['box'], ['in'], ['inside'], ['there']],
-          model: 'In the box.',
+          // 三档的示范句要各自落在自己那一档：basic 给单词，介词短语是 target
+          // 的活，完整祈使句才是 challenge。写成 'In the box.' 会被判成 target。
+          model: 'Box.',
         },
         {
           id: 'in_phrase',
@@ -124,7 +126,7 @@ export const toybox: Scene = {
             ['inside', 'box'],
             ['into', 'box'],
           ],
-          model: 'Put the car in the box.',
+          model: 'In the box.',
         },
         {
           id: 'in_full',
@@ -166,7 +168,7 @@ export const toybox: Scene = {
           id: 'on_word',
           level: 'basic',
           keywords: [['bed'], ['on'], ['under'], ['there']],
-          model: 'On the bed.',
+          model: 'The bed.',
         },
         {
           id: 'on_phrase',
@@ -177,7 +179,7 @@ export const toybox: Scene = {
             ['next to', 'bed'],
             ['beside', 'bed'],
           ],
-          model: 'Put the book on the bed.',
+          model: 'On the bed.',
         },
         {
           id: 'on_full',
@@ -256,10 +258,12 @@ export const toybox: Scene = {
         {
           id: 'teddy_two_words',
           level: 'challenge',
+          // challenge 要比 target 多要一样东西：target 的示范是「小而棕」两个
+          // 形容词，所以挑战档必须再带上材质或身份（soft / bear），否则两档等价。
           keywords: [
-            ['small|little', 'brown'],
+            ['small|little', 'brown', 'soft|bear|cute'],
             ['brown', 'soft'],
-            ['and', 'brown|small|soft'],
+            ['small|little', 'soft'],
           ],
           model: 'It is a small brown bear and it is very soft.',
         },

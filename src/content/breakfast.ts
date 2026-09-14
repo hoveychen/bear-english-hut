@@ -197,7 +197,9 @@ export const breakfast: Scene = {
             ['cook', 'plate'],
             ['fry', 'then'],
           ],
-          model: 'First we cook the egg, then we put it on the plate.',
+          // 不与 challenge 共用同一句：challenge 要求说到 plate，所以 target
+          // 的示范停在两步本身，否则说出 target 示范的孩子会被记成挑战档。
+          model: 'First we cook it, then we eat it.',
         },
         {
           id: 'cook_full',
