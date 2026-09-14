@@ -165,6 +165,44 @@ test('洗澡 b4：预测下一步，he will shake 的几种说法都收', () => 
   expectLevel(it, 'I think he will shake because he is wet.', 'challenge')
 })
 
+test('分档自洽：target / challenge 的示范句必须正好落在自己那一档', () => {
+  /*
+   * 为什么 basic 是例外：basic 的示范句往往也满足更高档（「Under the chair.」
+   * 既是 basic 的示范，也确实说出了介词短语），此时判 target 是**对的**——
+   * 系统对孩子宽容不是缺陷。
+   *
+   * 真正有害的是另外两个方向：
+   *   target 的示范被判成 challenge → 家长端把「能说完整句」虚报成挑战档；
+   *   challenge 的示范只判到 target → 孩子说到了却不算数。
+   * 两者都源于同一个写法：把三档的关键词写得互相包含。
+   */
+  for (const scene of scenes) {
+    for (const beat of scene.beats) {
+      const groups: Array<{ where: string; intents: Intent[] }> = [
+        { where: `${scene.id}/${beat.id}`, intents: beat.targetIntents },
+      ]
+      let fu = beat.followUp
+      let depth = 0
+      while (fu) {
+        groups.push({ where: `${scene.id}/${beat.id}/followUp#${depth}`, intents: fu.targetIntents })
+        fu = fu.followUp
+        depth++
+      }
+      for (const { where, intents } of groups) {
+        for (const intent of intents) {
+          if (intent.level === 'basic') continue
+          const r = matchIntents([intent.model], intents)
+          assert.equal(
+            r.level,
+            intent.level,
+            `${where} 的 ${intent.level} 示范「${intent.model}」被判成了 ${r.level}`,
+          )
+        }
+      }
+    }
+  }
+})
+
 test('每个节点的 basic 档都能被它自己的示范句命中', () => {
   // 遍历 scenes 而不是手写清单：这条扫描的价值全在「新加的场景也被扫到」，
   // 而写死三个场景恰恰保证了新场景扫不到。

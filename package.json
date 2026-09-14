@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit false --emitDeclarationOnly false --pretty",
+    "typecheck": "tsc -b --pretty",
     "test": "vitest run",
     "test:watch": "vitest",
     "audio:extract": "node scripts/extract-lines.ts",

@@ -200,7 +200,9 @@ export const picnic: Scene = {
             ['wash', 'then'],
             ['wash', 'basket'],
           ],
-          model: 'First we wash the apple, then we put it in the basket.',
+          // 不与 challenge 共用同一句：challenge 要求说到 basket，所以 target
+          // 的示范停在两步本身，否则说出 target 示范的孩子会被记成挑战档。
+          model: 'First we wash the apple, then we dry it.',
         },
         {
           id: 'seq_full',
