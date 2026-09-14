@@ -59,7 +59,14 @@ export type StageEffect =
   | { kind: 'weather'; to: 'sun' | 'rain' | 'snow' } // 天气变化
   | { kind: 'backdrop'; to: BackdropId } // 换场景
 
-export type BackdropId = 'home' | 'kitchen' | 'meadow' | 'bedroom' | 'livingroom'
+export type BackdropId =
+  | 'home'
+  | 'kitchen'
+  | 'meadow'
+  | 'bedroom'
+  | 'livingroom'
+  | 'supermarket'
+  | 'zoo'
 
 /** 三级支架（设计文档 §6 状态机的 support_1 / support_2 / fallback）。 */
 export type Support = {
