@@ -56,6 +56,13 @@ export function StartGate({ onStart }: { onStart: () => void }) {
           </span>
         </li>
         <li>
+          <span className="gate__icon" aria-hidden="true">👆</span>
+          <span>
+            小熊问完之后，<strong>按住</strong>底部的麦克风说英文，<strong>松手</strong>就算说完。
+            按着的时候才在听——这一条第一次玩最容易弄反。
+          </span>
+        </li>
+        <li>
           <span className="gate__icon" aria-hidden="true">🔊</span>
           <span>请把音量打开，并戴好耳机或在安静的房间里玩 —— 环境噪音会明显影响识别。</span>
         </li>
