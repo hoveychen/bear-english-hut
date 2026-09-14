@@ -19,7 +19,7 @@ type Spoken = { audio: string[]; tts: string[] }
  */
 async function freshSynthesis(
   manifest: Record<string, string> | null,
-  opts: { audioFails?: boolean; noSynthesis?: boolean; manifestDelayMs?: number } = {},
+  opts: { audioFails?: boolean; noSynthesis?: boolean; manifestDelayMs?: number; audioHangs?: boolean } = {},
 ) {
   vi.resetModules()
   const spoken: Spoken = { audio: [], tts: [] }
@@ -46,6 +46,8 @@ async function freshSynthesis(
     async play() {
       if (opts.audioFails) throw new Error('decode failed')
       spoken.audio.push(this.src.split('/').pop()!)
+      // 播得出声但 ended 永不来：设备缺失、下载断流、移动端后台标签页都会这样
+      if (opts.audioHangs) return
       // 真实 Audio 的 ended 是异步来的
       queueMicrotask(() => this.onended?.())
     }
@@ -161,4 +163,32 @@ test('连 speechSynthesis 都没有的浏览器：speak 照样 resolve，绝不 
   const { mod, spoken } = await freshSynthesis(null, { noSynthesis: true })
   await expect(mod.speak('anything', { tailMs: 0 })).resolves.toBeUndefined()
   expect(spoken.tts).toEqual([])
+})
+
+test('音频播放挂起（既不 ended 也不 error）时，speak 仍然会结束', async () => {
+  /*
+   * 这一条守的是"故事不能有死胡同"。
+   *
+   * 状态机是 `await say(...)` 之后才把阶段推到 observe/invite 的，所以一个
+   * 永不 settle 的 promise 和抛异常一样要命：界面会永远停在小熊说完话那一屏，
+   * 孩子按什么都没反应。而 `play()` 已经 resolve、`onended` 却不来，在真实
+   * 设备上是会发生的——音频设备缺失、下载中途断流、移动浏览器把标签页转入后台。
+   */
+  const { mod, spoken } = await freshSynthesis({ [LINE]: 'umbrella-rain.mp3' }, { audioHangs: true })
+
+  let settled = false
+  const p = mod.speak(LINE, { tailMs: 0 }).then(() => {
+    settled = true
+  })
+
+  // 走到超时之前不该提前结束
+  await vi.advanceTimersByTimeAsync(3000)
+  expect(settled).toBe(false)
+
+  // 上限是 min(16000, 5000 + 文本长度 * 120)，推过去之后必须结束
+  await vi.advanceTimersByTimeAsync(16000)
+  await p
+  expect(settled).toBe(true)
+  // 确实尝试播过录音，不是绕过去直接 resolve
+  expect(spoken.audio).toEqual(['umbrella-rain.mp3'])
 })

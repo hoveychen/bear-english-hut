@@ -99,6 +99,32 @@ export function earnedStickers(): StickerId[] {
 export function resetProgress() {
   try {
     localStorage.removeItem(KEY)
+    localStorage.removeItem(HINT_KEY)
+  } catch {
+    /* noop */
+  }
+}
+
+/*
+ * 首次演示的标记单独存一个键，不塞进 Progress。
+ *
+ * 理由是它和"学了多少"不是一回事：家长在报告页清空学习记录时，不该顺手把
+ * "这孩子已经知道怎么玩了"也抹掉——那会让她下次进游戏又被一只手指指挥一遍。
+ * 只有 resetProgress（整个重来）才连它一起清。
+ */
+const HINT_KEY = 'bear-english-hut/hint-seen/v1'
+
+export function hasSeenHint(): boolean {
+  try {
+    return localStorage.getItem(HINT_KEY) === '1'
+  } catch {
+    return true
+  }
+}
+
+export function markHintSeen() {
+  try {
+    localStorage.setItem(HINT_KEY, '1')
   } catch {
     /* noop */
   }
