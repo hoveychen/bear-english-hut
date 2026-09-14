@@ -1,0 +1,115 @@
+/*
+ * 首次演示的手指。
+ *
+ * 它是 fixed 定位并且 pointer-events: none —— 演示期间孩子随时可以真的去点，
+ * 手指绝不能挡在中间。它只是指出位置，不接管操作。
+ */
+.hint {
+  position: fixed;
+  z-index: 40;
+  pointer-events: none;
+  /* left/top 给的是目标元素的中心 */
+  transform: translate(-50%, -50%);
+}
+
+.hint__hand {
+  position: absolute;
+  /*
+   * .hint 的原点就是目标中心（它自身尺寸为 0，子元素都绝对定位）。
+   * 这里的负偏移把 SVG 里的指尖 (22, 5) 搬到那个原点上，手掌自然落在右下方，
+   * 不会盖住目标本身。
+   *
+   * 定位和动画都挂在这一层，朝向翻转挂在里面的 .hint__handArt 上——
+   * 两者同写在一个 transform 上会互相覆盖，手要么不翻要么不动。
+   */
+  left: -22px;
+  top: -5px;
+  display: block;
+  width: 76px;
+  height: 96px;
+  filter: drop-shadow(0 4px 0 rgba(46, 42, 38, 0.18));
+}
+
+.hint__handArt {
+  display: block;
+}
+
+/*
+ * 贴着屏幕底边的目标（麦克风）：手改从上方指下来。
+ * 上下翻转之后指尖落在图的底边，所以定位也跟着从"指尖在顶"改成"指尖在底"。
+ */
+.hint--above .hint__hand {
+  top: auto;
+  bottom: -5px;
+  /*
+   * 从上方指下来时手整体右挪一截：指尖仍落在按钮里，但手掌让开中央的
+   * 麦克风图标——孩子得看清自己要按的是什么，不能被演示的手盖住。
+   */
+  left: -2px;
+}
+.hint--above .hint__handArt {
+  transform: scaleY(-1);
+}
+
+.hint__ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  border: 4px solid var(--sea);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+/* ── 点一下：手指下压、弹起，涟漪一圈 ─────────────────── */
+.hint--tap .hint__hand {
+  animation: hint-tap 1900ms var(--ease-pop) infinite;
+}
+@keyframes hint-tap {
+  0%, 100%  { transform: translate(6px, 10px) rotate(-6deg); }
+  18%       { transform: translate(0, 0) rotate(0deg); }
+  30%       { transform: translate(0, 0) rotate(0deg); }
+  46%       { transform: translate(6px, 10px) rotate(-6deg); }
+}
+.hint--tap .hint__ring {
+  animation: hint-ripple-once 1900ms var(--ease-soft) infinite;
+}
+@keyframes hint-ripple-once {
+  0%, 16%  { transform: scale(0.5); opacity: 0; }
+  24%      { opacity: 0.85; }
+  48%      { transform: scale(1.5); opacity: 0; }
+  100%     { transform: scale(1.5); opacity: 0; }
+}
+
+/*
+ * ── 按住不放：手指压下去就**不弹起来**，涟漪一圈接一圈往外推 ──
+ *
+ * 这是整个演示里唯一需要孩子学会的区别：麦克风不是点一下，是按着说话。
+ * 所以按住这一版的手指刻意没有回弹关键帧——它压下去之后一直保持，
+ * 只有涟漪在动。
+ */
+.hint--hold .hint__hand {
+  animation: hint-press 2600ms var(--ease-pop) infinite;
+}
+@keyframes hint-press {
+  0%        { transform: translate(6px, 10px) rotate(-6deg); }
+  12%, 88%  { transform: translate(0, 2px) rotate(0deg); }
+  100%      { transform: translate(6px, 10px) rotate(-6deg); }
+}
+.hint--hold .hint__ring {
+  animation: hint-ripple-hold 1300ms var(--ease-soft) infinite;
+}
+@keyframes hint-ripple-hold {
+  0%   { transform: scale(0.6); opacity: 0; }
+  20%  { opacity: 0.8; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint__hand,
+  .hint__ring {
+    animation-duration: 4s;
+  }
+}

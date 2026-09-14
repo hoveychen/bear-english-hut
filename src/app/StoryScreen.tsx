@@ -1,10 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import type { Scene } from '../content/types'
 import { useBeatMachine } from '../state/useBeatMachine'
 import { StoryStage } from '../components/StoryStage'
 import { SpeechButton } from '../components/SpeechButton'
 import { SupportPrompt } from '../components/SupportPrompt'
+import { HandHint } from '../components/HandHint'
+import { hasSeenHint, markHintSeen } from '../state/progress'
 import { speak, unlockSpeech } from '../speech/synthesis'
 import './StoryScreen.css'
 
@@ -36,6 +38,43 @@ export function StoryScreen({ scene, onExit, onComplete }: Props) {
   }, [])
 
   const inviting = view.phase === 'invite' || view.phase === 'observe'
+
+  /*
+   * 第一次玩时的手指演示。
+   *
+   * 只在**第一个故事的第一拍、第一问**出现（attempt === 0）：孩子一旦走到支架，
+   * 小熊本来就会换个说法再问、还会高亮物品，再叠一只手指只会更吵。
+   */
+  const [hintSeen, setHintSeen] = useState(() => hasSeenHint())
+  const showHint = !hintSeen && view.beatIndex === 0 && view.attempt === 0 && !view.tapToContinue
+  const firstTarget = view.beat?.objects.find((o) => o.correct && !o.hidden) ?? view.beat?.objects.find((o) => !o.hidden)
+  const micUsable = view.micSupported && !view.voiceDisabled
+
+  const hint: { target: string; gesture: 'tap' | 'hold' } | null = !showHint
+    ? null
+    : view.phase === 'observe' && firstTarget
+      ? { target: `.stage__object[aria-label="${firstTarget.id}"]`, gesture: 'tap' }
+      : view.phase === 'invite' && micUsable
+        ? { target: '.mic__button', gesture: 'hold' }
+        : null
+
+  /*
+   * 麦克风用不上时（拒权、浏览器不支持），演示就只剩"点一下物品"这一步，
+   * 没有第二步可演。这种情况下到了 invite 阶段就直接收工，别让手指一直
+   * 指着一颗按不动的按钮。
+   */
+  useEffect(() => {
+    if (showHint && view.phase === 'invite' && !micUsable) {
+      markHintSeen()
+      setHintSeen(true)
+    }
+  }, [showHint, view.phase, micUsable])
+
+  const finishHint = () => {
+    if (hintSeen) return
+    markHintSeen()
+    setHintSeen(true)
+  }
 
   const replayStarter = () => {
     unlockSpeech()
@@ -74,7 +113,11 @@ export function StoryScreen({ scene, onExit, onComplete }: Props) {
           interim={view.interim}
           micSupported={view.micSupported}
           voiceDisabled={view.voiceDisabled}
-          onStart={startListening}
+          onStart={() => {
+            // 按住麦克风就是这段演示的终点：两步都做过了，往后不再出现
+            finishHint()
+            startListening()
+          }}
           onStop={stopListening}
           onReplay={() => void replay()}
           onSkip={skipWithTap}
@@ -101,6 +144,8 @@ export function StoryScreen({ scene, onExit, onComplete }: Props) {
           </p>
         )}
       </footer>
+
+      {hint && <HandHint target={hint.target} gesture={hint.gesture} />}
     </div>
   )
 }

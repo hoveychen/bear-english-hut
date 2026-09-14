@@ -113,8 +113,23 @@ export type SpeakOptions = {
 }
 
 /**
- * 播一句台词。Promise 在播完（或失败）后 resolve——**永远不 reject**：
- * 语音播不出来时故事必须能继续（设计文档 §8.3）。
+ * 这句话最多等多久。
+ *
+ * 「永不 reject」保证不了故事能继续——promise 挂着不 resolve 和 reject 一样
+ * 要命：状态机 `await say(...)` 之后才把阶段推到 observe/invite，卡在这里
+ * 界面就永远停在小熊说完话的那一屏，孩子按什么都没用。
+ *
+ * 真会发生：`audio.play()` 已经 resolve、但 `onended` 永不触发（音频设备缺失、
+ * 下载中途断流、某些移动浏览器后台标签页），此时既没有 error 也没有 ended，
+ * 两个回调一个都不来。所以按文本长度估一个上限，到点就当它播完了。
+ */
+function hardLimitFor(text: string): number {
+  return Math.min(16000, 5000 + text.length * 120)
+}
+
+/**
+ * 播一句台词。Promise 在播完（或失败、或超时）后 resolve——**永远不 reject**，
+ * 也**永远会 settle**：语音播不出来时故事必须能继续（设计文档 §8.3）。
  */
 export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
   const { rate = 0.85, pitch = 1.1, tailMs = 180 } = opts
@@ -122,9 +137,11 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
 
   return new Promise<void>((resolve) => {
     let settled = false
+    const guard = window.setTimeout(() => done(), hardLimitFor(text))
     const done = () => {
       if (settled) return
       settled = true
+      window.clearTimeout(guard)
       window.setTimeout(resolve, tailMs)
     }
 
