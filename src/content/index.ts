@@ -4,6 +4,7 @@ import { clothes } from './clothes'
 import { ball } from './ball'
 import { breakfast } from './breakfast'
 import { toybox } from './toybox'
+import { puppy } from './puppy'
 
 /**
  * 故事顺序即难度顺序：
@@ -13,7 +14,7 @@ import { toybox } from './toybox'
  * 后三个复用前三个已经画好的房间（厨房此前一直闲置），所以新增故事
  * 不欠新背景；孩子在同一个家里做不同的事，本来也更接近真实生活。
  */
-export const scenes: Scene[] = [picnic, clothes, ball, breakfast, toybox]
+export const scenes: Scene[] = [picnic, clothes, ball, breakfast, toybox, puppy]
 
 export function getScene(id: string): Scene | undefined {
   return scenes.find((s) => s.id === id)
