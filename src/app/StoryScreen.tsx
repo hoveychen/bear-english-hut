@@ -46,14 +46,33 @@ export function StoryScreen({ scene, onExit, onComplete }: Props) {
    * 小熊本来就会换个说法再问、还会高亮物品，再叠一只手指只会更吵。
    */
   const [hintSeen, setHintSeen] = useState(() => hasSeenHint())
+  /*
+   * observe 阶段分两小步：先指一下"再听一次"，再指该点的物品。
+   *
+   * 喇叭放在最前面而不是等孩子卡住才教：小熊刚说完、她还没动手的这一刻，
+   * 正是"没听清"最可能发生的时候；而如果等进了支架再教，第一次就说对的
+   * 孩子会永远不知道有这颗键。
+   */
+  const [hintStep, setHintStep] = useState<'replay' | 'object'>('replay')
   const showHint = !hintSeen && view.beatIndex === 0 && view.attempt === 0 && !view.tapToContinue
   const firstTarget = view.beat?.objects.find((o) => o.correct && !o.hidden) ?? view.beat?.objects.find((o) => !o.hidden)
   const micUsable = view.micSupported && !view.voiceDisabled
 
+  useEffect(() => {
+    if (!showHint || view.phase !== 'observe') return
+    setHintStep('replay')
+    const t = window.setTimeout(() => setHintStep('object'), 2600)
+    return () => window.clearTimeout(t)
+  }, [showHint, view.phase])
+
   const hint: { target: string; gesture: 'tap' | 'hold' } | null = !showHint
     ? null
-    : view.phase === 'observe' && firstTarget
-      ? { target: `.stage__object[aria-label="${firstTarget.id}"]`, gesture: 'tap' }
+    : view.phase === 'observe'
+      ? hintStep === 'replay'
+        ? { target: '[aria-label="再听一次"]', gesture: 'tap' }
+        : firstTarget
+          ? { target: `.stage__object[aria-label="${firstTarget.id}"]`, gesture: 'tap' }
+          : null
       : view.phase === 'invite' && micUsable
         ? { target: '.mic__button', gesture: 'hold' }
         : null
