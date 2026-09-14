@@ -60,6 +60,32 @@ export function WaterBasin({ size = 120, className = '' }: ShapeProps) {
 }
 
 /**
+ * 儿童积木。
+ *
+ * 这个必须手绘：OpenMoji 里离"积木"最近的码点是 1F9F1，但它画出来是一堵
+ * 红砖墙，摆进"收玩具"的房间里孩子只会说 brick。三块叠着的彩色方块才是
+ * blocks 这个词指的东西。
+ */
+export function Blocks({ size = 130, className = '' }: ShapeProps) {
+  return (
+    <svg viewBox="0 0 120 100" width={size} height={(size * 100) / 120} className={className} role="img" aria-label="积木">
+      {/* 底下两块并排，上面压一块——歪一点才像小孩堆的 */}
+      <g stroke="#2e2a26" strokeWidth="3.4" strokeLinejoin="round">
+        <rect x="14" y="54" width="44" height="36" rx="4" fill="#dc5b3c" transform="rotate(-3 36 72)" />
+        <rect x="62" y="56" width="42" height="34" rx="4" fill="#5b8fa8" transform="rotate(2 83 73)" />
+        <rect x="38" y="16" width="42" height="36" rx="4" fill="#e9a13b" transform="rotate(-6 59 34)" />
+      </g>
+      {/* 面上的字母，绘本积木的标配 */}
+      <g fill="#fbf7ec" fontFamily="inherit" fontWeight="700" fontSize="19" textAnchor="middle">
+        <text x="36" y="79" transform="rotate(-3 36 79)">A</text>
+        <text x="83" y="80" transform="rotate(2 83 80)">B</text>
+        <text x="59" y="41" transform="rotate(-6 59 41)">C</text>
+      </g>
+    </svg>
+  )
+}
+
+/**
  * 按内容层的 `drawn:<name>` 取到对应的手绘道具。
  *
  * 舞台和图片顺序卡都要用它——顺序卡最初只认图片文件 URL，结果"先洗苹果"
@@ -69,6 +95,7 @@ export function DrawnProp({ name, size }: { name: string; size?: number }) {
   if (name === 'blanket') return <Blanket size={size ?? 150} />
   if (name === 'basin') return <WaterBasin size={size ?? 130} />
   if (name === 'table') return <Table size={size ?? 160} />
+  if (name === 'blocks') return <Blocks size={size ?? 130} />
   return null
 }
 

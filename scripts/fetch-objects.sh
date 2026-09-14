@@ -20,7 +20,9 @@ declare -a MAP=(
   "plate:1F37D"        "spoon:1F944"       "bowl:1F963"       "honey:1F36F"
 
   # 场景五 · 卧室收玩具
-  "blocks:1F9F1"       "book:1F4D6"        "car:1F697"        "robot:1F916"
+  # blocks（1F9F1）画出来是一堵红砖墙，不是儿童积木，所以改为手绘
+  # （src/components/HandDrawn.tsx 的 Blocks），这里不收。
+  "book:1F4D6"         "car:1F697"         "robot:1F916"
   "puzzle:1F9E9"       "bed:1F6CF"         "drum:1F941"       "crayon:1F58D"
 
   # 场景六 · 起居室给狗洗澡

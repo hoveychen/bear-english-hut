@@ -33,7 +33,8 @@ const COVER: Record<string, string[]> = {
   ball: ['ball', 'dog', 'box'],
   // pan 是一大块灰，摆在封面第一位会把整张卡压得发灰；bread 的暖黄撑得起来
   breakfast: ['bread', 'egg', 'milk'],
-  toybox: ['box', 'blocks', 'teddy'],
+  // 封面走 artUrl（只认 objects 里的文件），认不了 drawn: 道具，所以积木上不了封面
+  toybox: ['box', 'car', 'teddy'],
   puppy: ['dog', 'bathtub', 'soap'],
 }
 
