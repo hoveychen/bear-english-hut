@@ -5,16 +5,19 @@
  * （校验覆盖率）都从这里取数据，保证两边看到的是同一份台词表——
  * 否则清单和校验各走各的，录完才发现对不上。
  *
- * 直接 import 各场景文件而不是 `src/content/index.ts`：后者用了无扩展名导入，
- * Node 的 ESM 解析不认（只有 Vite 的 bundler 解析认）。
+ * 场景清单直接取自 `src/content/index.ts`，**不再在这里另抄一份**。
+ * 先前这里维护了自己的 `[picnic, clothes, ball]`，于是新增场景时这份名单
+ * 不会跟着长——而 verify-audio 也从这里取数，结果是缺了整整三个场景的台词，
+ * 覆盖率却照样报 100%。一份假的绿比红还糟，所以名单只能有一处。
+ *
+ * （index.ts 的导入为此带上了 .ts 扩展名：Node 的 ESM 解析不认无扩展名导入。）
  */
 
-import { picnic } from '../src/content/picnic.ts'
-import { clothes } from '../src/content/clothes.ts'
-import { ball } from '../src/content/ball.ts'
+import { scenes } from '../src/content/index.ts'
 import type { FollowUp, Scene } from '../src/content/types.ts'
 
-export const scenes: Scene[] = [picnic, clothes, ball]
+export { scenes }
+export type { Scene }
 
 /** 一句台词在故事里担任的角色。决定录音时的语气。 */
 export type LineRole =
