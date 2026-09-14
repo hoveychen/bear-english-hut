@@ -107,18 +107,57 @@ function Home() {
 function Kitchen() {
   return (
     <>
-      <rect width="1000" height="420" fill="#e9edd9" />
+      <rect width="1000" height="450" fill="#e9edd9" />
       {/* 瓷砖：故意画歪，别做成 pattern */}
       <g stroke="#cdd4b6" strokeWidth="4">
-        {[80, 160, 240, 320].map((y) => (
+        {[80, 160, 240, 320, 400].map((y) => (
           <path key={y} d={`M0 ${y} Q500 ${y - 6} 1000 ${y + 4}`} fill="none" />
         ))}
         {[0, 140, 280, 420, 560, 700, 840, 980].map((x) => (
-          <path key={x} d={`M${x} 0 Q${x + 5} 200 ${x - 3} 400`} fill="none" />
+          <path key={x} d={`M${x} 0 Q${x + 5} 220 ${x - 3} 440`} fill="none" />
         ))}
       </g>
-      <rect y="420" width="1000" height="60" fill="#c98c4e" stroke="#2e2a26" strokeWidth="6" />
-      <rect y="480" width="1000" height="170" fill="#a86e38" />
+
+      {/*
+       * 吊柜和窗都吊在 y < 300 的墙上：小熊站在左侧（CSS left:16%，约占 x 78~242）、
+       * 物品全部落在 y > 450 的台面上，所以这一带是整面墙唯一不会被挡住的地方。
+       */}
+      <g fill="#d9bc93" stroke="#2e2a26" strokeWidth="6" strokeLinejoin="round">
+        <rect x="30" y="60" width="240" height="130" rx="6" />
+        <rect x="730" y="60" width="240" height="130" rx="6" />
+      </g>
+      <g stroke="#2e2a26" strokeWidth="4" fill="none">
+        <path d="M150 60 L150 190 M850 60 L850 190" />
+      </g>
+      <g fill="#2e2a26">
+        <rect x="132" y="150" width="6" height="26" rx="3" />
+        <rect x="162" y="150" width="6" height="26" rx="3" />
+        <rect x="832" y="150" width="6" height="26" rx="3" />
+        <rect x="862" y="150" width="6" height="26" rx="3" />
+      </g>
+
+      {/* 窗：早餐时天刚亮，所以只给一片素净的天。不登记进 WINDOW 表——
+          厨房故事不带天气，登记了反而要为一个永远不画的图层留分支。 */}
+      <rect x="390" y="72" width="230" height="176" rx="8" fill="#cfe6ef" stroke="#2e2a26" strokeWidth="7" />
+      <path d="M505 72 L505 248 M390 160 L620 160" stroke="#2e2a26" strokeWidth="6" />
+      <path d="M372 248 L638 248" stroke="#a86e38" strokeWidth="12" strokeLinecap="round" />
+
+      {/*
+       * 台面顶面压在 y=450 —— 和 home 的地板线同高。
+       * 物品是固定 108px、按中心定位的，所以它们会像在别的房间一样略微"陷进"
+       * 这条线；台面若像初版那样只有 60 高，物品就会一路插进柜门里。
+       */}
+      <rect y="450" width="1000" height="30" fill="#d9a86a" stroke="#2e2a26" strokeWidth="6" />
+      <rect y="480" width="1000" height="104" fill="#c98c4e" />
+      <g stroke="#a86e38" strokeWidth="5" fill="none">
+        <path d="M250 484 L250 580 M560 484 L560 580 M820 484 L820 580" />
+      </g>
+      <g fill="#2e2a26">
+        <rect x="222" y="512" width="24" height="7" rx="3.5" />
+        <rect x="532" y="512" width="24" height="7" rx="3.5" />
+        <rect x="792" y="512" width="24" height="7" rx="3.5" />
+      </g>
+      <rect y="584" width="1000" height="70" fill="#a86e38" />
     </>
   )
 }
