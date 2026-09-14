@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+
 import { MicIcon, ReplayIcon } from './HandDrawn'
 import type { Phase } from '../state/useBeatMachine'
 import './SpeechButton.css'
@@ -50,6 +52,51 @@ export function SpeechButton({
     phase === 'thinking'
   const usable = micSupported && !voiceDisabled
 
+  /*
+   * 按住说话，不是点开点关。
+   *
+   * 这颗按钮以前绑的是 onClick（点一下开始、再点一下结束），可它的标签一直
+   * 写着"按住说话"。第一个照着标签做的人立刻就卡住了：按住期间根本没在录音，
+   * 松手它才开始录，那时人已经不说了——症状是"说了半天一点反应都没有"。
+   *
+   * 统一到按住这一边，而不是反过来改标签：对着 5 岁孩子，对讲机式的
+   * "按着才录、松手就完"不需要她理解两次点击的含义不同。
+   */
+  const holding = useRef(false)
+
+  const beginHold = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!usable || listening) return
+    // 捕获指针：手指按住后滑出按钮范围，松手时仍然收得到 pointerup，
+    // 否则录音会一直开着，直到 9 秒上限才自己停
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+    holding.current = true
+    onStart()
+  }
+
+  const endHold = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (!holding.current) return
+    holding.current = false
+    if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    }
+    onStop()
+  }
+
+  /* 键盘等价：空格/回车按下开始、抬起结束。孩子不用键盘，但读屏用户要用。 */
+  const keyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key !== ' ' && e.key !== 'Enter') return
+    e.preventDefault()
+    if (e.repeat || !usable || listening) return
+    holding.current = true
+    onStart()
+  }
+  const keyUp = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key !== ' ' && e.key !== 'Enter') return
+    if (!holding.current) return
+    holding.current = false
+    onStop()
+  }
+
   return (
     <div className="mic">
       <button
@@ -81,9 +128,15 @@ export function SpeechButton({
           ]
             .filter(Boolean)
             .join(' ')}
-          onClick={listening ? onStop : usable ? onStart : onSkip}
+          onPointerDown={beginHold}
+          onPointerUp={endHold}
+          onPointerCancel={endHold}
+          onKeyDown={keyDown}
+          onKeyUp={keyUp}
+          // 麦克风用不了时降级成纯点选：这时它就是一颗"继续故事"的普通按钮
+          onClick={usable ? undefined : onSkip}
           disabled={busy}
-          aria-label={listening ? '我说完了' : usable ? '按住说话' : '继续故事'}
+          aria-label={listening ? '松开就说完了' : usable ? '按住说话' : '继续故事'}
         >
           <MicIcon size={58} />
         </button>
