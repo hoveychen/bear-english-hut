@@ -2,7 +2,7 @@
 
 本文件由 `scripts/extract-lines.ts` 从内容层生成，**不要手改**——改台词请改 `src/content/*.ts` 再重跑脚本。
 
-全片共 **320** 处发声，按文本去重后是 **257** 句独立台词。（同一句话在多处复用的只生成一份音频，见下面「共用台词」。）
+全片共 **425** 处发声，按文本去重后是 **341** 句独立台词。（同一句话在多处复用的只生成一份音频，见下面「共用台词」。）
 
 ## 这份文档怎么用
 
@@ -27,18 +27,20 @@ node scripts/verify-audio.ts               # 复核覆盖率与失效条目
 
 | 文件名 | 台词 | 语气 | 出现在 |
 |---|---|---|---|
-| `you-can-start-like-this.mp3` | **You can start like this.** | 像要一起说出来那样，带点引导 | 小熊准备野餐·b1_food<br>小熊做早餐·b1_choose_food<br>小熊收玩具·b1_what_you_see<br>…共 4 处 |
-| `start-like-this.mp3` | **Start like this.** | 像要一起说出来那样，带点引导 | 小熊准备野餐·b1_food·追问1<br>小熊准备野餐·b2_cup_blanket<br>小熊准备野餐·b3_sequence<br>…共 32 处 |
+| `you-can-start-like-this.mp3` | **You can start like this.** | 像要一起说出来那样，带点引导 | 小熊准备野餐·b1_food<br>小熊做早餐·b1_choose_food<br>小熊收玩具·b1_what_you_see<br>…共 6 处 |
+| `start-like-this.mp3` | **Start like this.** | 像要一起说出来那样，带点引导 | 小熊准备野餐·b1_food·追问1<br>小熊准备野餐·b2_cup_blanket<br>小熊准备野餐·b3_sequence<br>…共 43 处 |
 | `we-need-a.mp3` | **We need a ...** | 只念句首，尾音悬着等她接 | 小熊准备野餐·b2_cup_blanket<br>小熊的衣服出了问题·b4_too_small·追问1<br>小熊做早餐·b2_choose_tool |
 | `nice-why-do-we-need-it.mp3` | **Nice. Why do we need it?** | 好奇、真的在问，不是考她 | 小熊准备野餐·b2_cup_blanket·追问1<br>小熊做早餐·b2_choose_tool·追问1 |
 | `why-do-we-need-it-tell.mp3` | **Why do we need it? Tell me.** | 耐心，换个说法再问一次，不能有一丝责备 | 小熊准备野餐·b2_cup_blanket·追问1<br>小熊做早餐·b2_choose_tool·追问1 |
-| `start-with-this-word.mp3` | **Start with this word.** | 像要一起说出来那样，带点引导 | 小熊准备野餐·b2_cup_blanket·追问1<br>小熊准备野餐·b3_sequence·追问1<br>小熊准备野餐·b4_rain·追问1<br>…共 13 处 |
-| `because.mp3` | **Because ...** | 只念句首，尾音悬着等她接 | 小熊准备野餐·b2_cup_blanket·追问1<br>小熊的衣服出了问题·b5_alternative·追问1 |
+| `start-with-this-word.mp3` | **Start with this word.** | 像要一起说出来那样，带点引导 | 小熊准备野餐·b2_cup_blanket·追问1<br>小熊准备野餐·b3_sequence·追问1<br>小熊准备野餐·b4_rain·追问1<br>…共 16 处 |
+| `because.mp3` | **Because ...** | 只念句首，尾音悬着等她接 | 小熊准备野餐·b2_cup_blanket·追问1<br>小熊的衣服出了问题·b5_alternative·追问1<br>小熊去超市·b3_which_one·追问1 |
 | `first-we.mp3` | **First we ...** | 只念句首，尾音悬着等她接 | 小熊准备野餐·b3_sequence<br>小熊做早餐·b3_sequence |
 | `and-then-what-happens-next.mp3` | **And then? What happens next?** | 好奇、真的在问，不是考她 | 小熊准备野餐·b3_sequence·追问1<br>小熊做早餐·b3_sequence·追问1 |
 | `you-told-me-the-whole-order.mp3` | **You told me the whole order. Well done!** | 高兴但不夸张，别像游戏音效 | 小熊准备野餐·b3_sequence·追问1<br>小熊做早餐·b3_sequence·追问1 |
 | `then-we.mp3` | **Then we ...** | 只念句首，尾音悬着等她接 | 小熊准备野餐·b3_sequence·追问1<br>小熊做早餐·b3_sequence·追问1 |
 | `because-it-is.mp3` | **Because it is ...** | 只念句首，尾音悬着等她接 | 小熊准备野餐·b4_rain·追问1<br>小熊的衣服出了问题·b2_why |
+| `why-do-i-need-it.mp3` | **Why do I need it?** | 好奇、真的在问，不是考她 | 小熊做早餐·b4_missing·追问1<br>小熊去超市·b4_forgot·追问1 |
+| `i-can-see-a.mp3` | **I can see a ...** | 只念句首，尾音悬着等她接 | 小熊收玩具·b1_what_you_see<br>小熊逛动物园·b1_what_animal |
 
 ## 小熊准备野餐
 
@@ -334,7 +336,6 @@ node scripts/verify-audio.ts               # 复核覆盖率与失效条目
 | `my-mouth-is-dry-what-can.mp3` | **My mouth is dry. What can I drink?** | 耐心，换个说法再问一次，不能有一丝责备 |
 | `you-need-some.mp3` | **You need some ...** | 只念句首，尾音悬着等她接 |
 | `i-need-some-milk-tap-it.mp3` | **I need some milk. Tap it!** | 轻松地自己说完，不要有"你没说对"的意味 |
-| `why-do-i-need-it.mp3` | **Why do I need it?** | 好奇、真的在问，不是考她 |
 | `exactly-because-i-am-thirsty.mp3` | **Exactly! Because I am thirsty.** | 高兴但不夸张，别像游戏音效 |
 | `my-mouth-is-dry-why-do.mp3` | **My mouth is dry. Why do I need it?** | 耐心，换个说法再问一次，不能有一丝责备 |
 | `because-you-are.mp3` | **Because you are ...** | 只念句首，尾音悬着等她接 |
@@ -374,7 +375,6 @@ node scripts/verify-audio.ts               # 复核覆盖率与失效条目
 | `you-can-say-i-can-see.mp3` | **You can say: I can see a car.** | 放慢、清楚，示范给她听 |
 | `you-are-right-what-a-mess.mp3` | **You are right. What a mess!** | 高兴但不夸张，别像游戏音效 |
 | `look-at-the-floor-what-is.mp3` | **Look at the floor. What is there?** | 耐心，换个说法再问一次，不能有一丝责备 |
-| `i-can-see-a.mp3` | **I can see a ...** | 只念句首，尾音悬着等她接 |
 | `i-can-see-a-car-some.mp3` | **I can see a car, some blocks and a book. Tap one!** | 轻松地自己说完，不要有"你没说对"的意味 |
 | `good-can-you-tell-me-one.mp3` | **Good! Can you tell me one more thing you see?** | 好奇、真的在问，不是考她 |
 | `you-found-them-all.mp3` | **You found them all!** | 高兴但不夸张，别像游戏音效 |
@@ -518,6 +518,168 @@ node scripts/verify-audio.ts               # 复核覆盖率与失效条目
 | 文件名 | 台词 | 语气 |
 |---|---|---|
 | `my-puppy-is-clean-and-happy.mp3` | **My puppy is clean and happy! Thank you for helping me wash him. You said so much today!** | 满足、由衷地谢谢她 |
+
+## 小熊去超市
+
+> 推着购物车，告诉小熊要买哪一样、为什么要它
+
+### 整场
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `here-we-are-at-the-shop.mp3` | **Here we are at the shop! I have my cart. Will you help me find what we need?** | 热情、邀请，像朋友来敲门 |
+
+### b1_what_to_buy — So many things here! What should we put in the cart?
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `so-many-things-here-what-should.mp3` | **So many things here! What should we put in the cart?** | 好奇、真的在问，不是考她 |
+| `you-can-say-lets-get-the.mp3` | **You can say: Let's get the apple.** | 放慢、清楚，示范给她听 |
+| `good-choice-in-the-cart.mp3` | **Good choice! In the cart.** | 高兴但不夸张，别像游戏音效 |
+| `look-at-the-shelf-what-shall.mp3` | **Look at the shelf. What shall we buy?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `lets-get-the.mp3` | **Let's get the ...** | 只念句首，尾音悬着等她接 |
+| `lets-get-the-apple-tap-the.mp3` | **Let's get the apple. Tap the one you want!** | 轻松地自己说完，不要有"你没说对"的意味 |
+| `good-say-it-in-a-big.mp3` | **Good! Say it in a big sentence for me. Let's get the ...** | 好奇、真的在问，不是考她 |
+| `into-the-cart-it-goes.mp3` | **Into the cart it goes!** | 高兴但不夸张，别像游戏音效 |
+| `try-with-me-lets-get-the.mp3` | **Try with me. Let's get the ... what?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `lets-get-the-apple-your-turn.mp3` | **Let's get the apple. Your turn next time!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### b2_find_by_colour — I need the red one, but I cannot see it. Which one is red?
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `i-need-the-red-one-but.mp3` | **I need the red one, but I cannot see it. Which one is red?** | 好奇、真的在问，不是考她 |
+| `that-is-the-one-thank-you.mp3` | **That is the one! Thank you.** | 高兴但不夸张，别像游戏音效 |
+| `one-of-them-is-red-like.mp3` | **One of them is red like an apple. Which one?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `the-is-red.mp3` | **The ... is red.** | 只念句首，尾音悬着等她接 |
+| `the-tomato-is-red-tap-it.mp3` | **The tomato is red. Tap it!** | 轻松地自己说完，不要有"你没说对"的意味 |
+| `clever-and-what-colour-is-the.mp3` | **Clever! And what colour is the carrot?** | 好奇、真的在问，不是考她 |
+| `you-know-all-your-colours.mp3` | **You know all your colours!** | 高兴但不夸张，别像游戏音效 |
+| `look-at-the-carrot-what-colour.mp3` | **Look at the carrot. What colour is it?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `the-carrot-is.mp3` | **The carrot is ...** | 只念句首，尾音悬着等她接 |
+| `the-carrot-is-orange.mp3` | **The carrot is orange!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### b3_which_one — We can only take one melon. Do you want the big one or the small one?
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `we-can-only-take-one-melon.mp3` | **We can only take one melon. Do you want the big one or the small one?** | 好奇、真的在问，不是考她 |
+| `you-can-say-i-want-the.mp3` | **You can say: I want the big one because we are hungry.** | 放慢、清楚，示范给她听 |
+| `good-pick-into-the-cart.mp3` | **Good pick! Into the cart.** | 高兴但不夸张，别像游戏音效 |
+| `one-is-big-one-is-small.mp3` | **One is big, one is small. Which do you want?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `i-want-the.mp3` | **I want the ...** | 只念句首，尾音悬着等她接 |
+| `i-want-the-big-one-tap.mp3` | **I want the big one. Tap the one you like!** | 轻松地自己说完，不要有"你没说对"的意味 |
+| `tell-me-why-you-picked-that.mp3` | **Tell me why you picked that one.** | 好奇、真的在问，不是考她 |
+| `that-is-a-very-good-reason.mp3` | **That is a very good reason!** | 高兴但不夸张，别像游戏音效 |
+| `why-that-one-and-not-the.mp3` | **Why that one and not the other?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `because-we-can-share-it-good.mp3` | **Because we can share it. Good thinking!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### b4_forgot — Oh no! The cart is full but I cannot carry it all home. What did I forget?
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `oh-no-the-cart-is-full.mp3` | **Oh no! The cart is full but I cannot carry it all home. What did I forget?** | 好奇、真的在问，不是考她 |
+| `got-it-now-everything-fits.mp3` | **Got it! Now everything fits.** | 高兴但不夸张，别像游戏音效 |
+| `something-to-put-the-shopping-in.mp3` | **Something to put the shopping in. What is it?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `you-need-a.mp3` | **You need a ...** | 只念句首，尾音悬着等她接 |
+| `i-need-a-bag-tap-it.mp3` | **I need a bag. Tap it!** | 轻松地自己说完，不要有"你没说对"的意味 |
+| `exactly-my-paws-are-full.mp3` | **Exactly! My paws are full.** | 高兴但不夸张，别像游戏音效 |
+| `look-at-my-paws-how-will.mp3` | **Look at my paws. How will I carry all this?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `because-you.mp3` | **Because you ...** | 只念句首，尾音悬着等她接 |
+| `because-i-have-to-carry-it.mp3` | **Because I have to carry it all home!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### b5_retell — Time to go home! Can you tell me what we bought today?
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `time-to-go-home-can-you.mp3` | **Time to go home! Can you tell me what we bought today?** | 好奇、真的在问，不是考她 |
+| `you-remembered-the-whole-list.mp3` | **You remembered the whole list!** | 高兴但不夸张，别像游戏音效 |
+| `look-in-the-bag-what-did.mp3` | **Look in the bag. What did we buy?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `we-bought.mp3` | **We bought ...** | 只念句首，尾音悬着等她接 |
+| `we-bought-an-apple-a-tomato.mp3` | **We bought an apple, a tomato and a big melon!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### 整场
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `our-cart-is-full-thank-you.mp3` | **Our cart is full! Thank you for shopping with me. You told me exactly what to get!** | 满足、由衷地谢谢她 |
+
+## 小熊逛动物园
+
+> 在动物园里认一认这些动物，把它们的样子讲给小熊听
+
+### 整场
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `we-are-at-the-zoo-look.mp3` | **We are at the zoo! Look at all the animals. Can you tell me what you see?** | 热情、邀请，像朋友来敲门 |
+
+### b1_what_animal — Wow! Look over there. What animal can you see?
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `wow-look-over-there-what-animal.mp3` | **Wow! Look over there. What animal can you see?** | 好奇、真的在问，不是考她 |
+| `you-can-say-i-can-see-2.mp3` | **You can say: I can see an elephant.** | 放慢、清楚，示范给她听 |
+| `you-found-it-hello-elephant.mp3` | **You found it! Hello, elephant!** | 高兴但不夸张，别像游戏音效 |
+| `look-over-there-which-animal-is.mp3` | **Look over there. Which animal is it?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `i-can-see-an-elephant-tap.mp3` | **I can see an elephant. Tap the one you like!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### b2_describe_it — Look at the giraffe. What does she look like?
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `look-at-the-giraffe-what-does.mp3` | **Look at the giraffe. What does she look like?** | 好奇、真的在问，不是考她 |
+| `you-can-say-she-is-very.mp3` | **You can say: She is very tall.** | 放慢、清楚，示范给她听 |
+| `that-is-right-she-can-reach.mp3` | **That is right! She can reach the highest leaves.** | 高兴但不夸张，别像游戏音效 |
+| `is-she-short-or-tall-look.mp3` | **Is she short or tall? Look at her neck.** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `she-is.mp3` | **She is ...** | 只念句首，尾音悬着等她接 |
+| `she-is-very-tall-and-she.mp3` | **She is very tall and she has a long neck!** | 轻松地自己说完，不要有"你没说对"的意味 |
+| `and-the-zebra-tell-me-about.mp3` | **And the zebra? Tell me about her too.** | 好奇、真的在问，不是考她 |
+| `you-described-them-both.mp3` | **You described them both!** | 高兴但不夸张，别像游戏音效 |
+| `look-at-her-coat-what-colours.mp3` | **Look at her coat. What colours do you see?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `she-is-black-and-white.mp3` | **She is black and white!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### b3_where_is_it — Careful! Where is the snake? I cannot find it.
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `careful-where-is-the-snake-i.mp3` | **Careful! Where is the snake? I cannot find it.** | 好奇、真的在问，不是考她 |
+| `there-you-are-snake-hiding-in.mp3` | **There you are, snake! Hiding in the shade.** | 高兴但不夸张，别像游戏音效 |
+| `look-near-the-tree-is-it.mp3` | **Look near the tree. Is it up high or down low?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `it-is-under-the.mp3` | **It is under the ...** | 只念句首，尾音悬着等她接 |
+| `it-is-under-the-tree-tap.mp3` | **It is under the tree. Tap it!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### b4_feed_it — The monkey looks hungry. What should we give her?
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `the-monkey-looks-hungry-what-should.mp3` | **The monkey looks hungry. What should we give her?** | 好奇、真的在问，不是考她 |
+| `you-can-say-give-her-the.mp3` | **You can say: Give her the banana.** | 放慢、清楚，示范给她听 |
+| `munch-munch-she-loves-it.mp3` | **Munch munch! She loves it.** | 高兴但不夸张，别像游戏音效 |
+| `which-food-is-right-for-a.mp3` | **Which food is right for a monkey?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `give-her-the.mp3` | **Give her the ...** | 只念句首，尾音悬着等她接 |
+| `give-her-the-banana-tap-it.mp3` | **Give her the banana. Tap it!** | 轻松地自己说完，不要有"你没说对"的意味 |
+| `why-that-one-the-cookie-looks.mp3` | **Why that one? The cookie looks nice too.** | 好奇、真的在问，不是考她 |
+| `you-are-right-cookies-are-for.mp3` | **You are right. Cookies are for bears, not monkeys!** | 高兴但不夸张，别像游戏音效 |
+| `what-do-monkeys-eat-in-the.mp3` | **What do monkeys eat in the jungle?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `because-monkeys.mp3` | **Because monkeys ...** | 只念句首，尾音悬着等她接 |
+| `because-monkeys-love-bananas.mp3` | **Because monkeys love bananas!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### b5_retell — The zoo is closing. Can you tell me all the animals we saw today?
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `the-zoo-is-closing-can-you.mp3` | **The zoo is closing. Can you tell me all the animals we saw today?** | 好奇、真的在问，不是考她 |
+| `you-remembered-every-single-animal.mp3` | **You remembered every single animal!** | 高兴但不夸张，别像游戏音效 |
+| `think-back-which-animals-did-we.mp3` | **Think back. Which animals did we meet?** | 耐心，换个说法再问一次，不能有一丝责备 |
+| `we-saw.mp3` | **We saw ...** | 只念句首，尾音悬着等她接 |
+| `we-saw-an-elephant-a-giraffe.mp3` | **We saw an elephant, a giraffe, a monkey and a zebra!** | 轻松地自己说完，不要有"你没说对"的意味 |
+
+### 整场
+
+| 文件名 | 台词 | 语气 |
+|---|---|---|
+| `what-a-day-at-the-zoo.mp3` | **What a day at the zoo! Thank you for telling me about every animal. You are a wonderful talker!** | 满足、由衷地谢谢她 |
 
 ---
 

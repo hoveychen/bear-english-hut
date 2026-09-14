@@ -37,7 +37,7 @@ pnpm test       # vitest
 ```
 src/
   app/          StartGate（音频解锁 + 权限说明）/ HomeScreen / StoryScreen / ParentReport
-  content/      types.ts + 六个场景。所有英文台词、意图、支架都在这里
+  content/      types.ts + 八个场景。所有英文台词、意图、支架都在这里
   speech/       recognition（只管录音状态）/ synthesis（录音优先，TTS 兜底）
                 intentMatcher（三档判定，不做发音评分）
   state/        useBeatMachine（互动节点状态机）/ progress（localStorage）/ report
@@ -91,7 +91,7 @@ Windows 上是 Zira、安卓上又是别的，语速和断句都不一样。预�
 
 ```bash
 pnpm audio:extract   # 台词总览 → public/audio/LINES.md
-pnpm audio:generate  # 生成音频 + 写 manifest（OpenRouter，约 $4.6 / 全量 257 句）
+pnpm audio:generate  # 生成音频 + 写 manifest（OpenRouter，约 $6 / 全量 341 句）
 pnpm audio:verify    # 还差哪些？哪些生成了但已失效？
 ```
 
@@ -117,9 +117,10 @@ manifest 里没有的句子自动走浏览器 TTS，做一个场景就能立刻�
    单价便宜但会跑飞。默认用 full。
 3. **光核对文本不够。** 那次跑飞里模型回报的 transcript 是对的，音频却有
    16384 个 token。所以除了逐字校对，还有**时长合理性检查**和 `max_tokens` 闸。
-4. **`--dry-run` 的预估偏低约三倍。** 补三个新场景那次，预估 $0.77，实际
-   $2.27。预估只按文本长度算，没算进音频 token 的实际膨胀。要估预算就按
-   预估值的三倍看。
+4. **`--dry-run` 的预估偏低两到三倍。** 两次实测：补三个家庭场景，预估 $0.77
+   实际 $2.27（2.9 倍）；补超市和动物园，预估 $0.51 实际 $1.07（2.1 倍）。
+   预估只按文本长度算，没算进音频 token 的实际膨胀。要估预算就按预估值的
+   三倍留余量。
 
 ### 校验查四件事，第三件最要紧
 
