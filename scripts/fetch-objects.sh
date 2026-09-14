@@ -30,6 +30,16 @@ declare -a MAP=(
   # comb（1FAE5）在 OpenMoji 里抓回来的是"未知码点"占位图（虚线圆脸），不是梳子，
   # 所以不收。洗澡场景靠 soap / sponge / shower / bucket 已经够用。
   "bone:1F9B4"         "duck:1F986"        "bucket:1FAA3"
+
+  # 场景七 · 超市购物
+  "cart:1F6D2"         "carrot:1F955"      "tomato:1F345"     "cheese:1F9C0"
+  # coins（1FA99）画面上印着数字 1，而孩子端是无文字的；付钱也不是这个场景的
+  # 语言目标，所以不收。
+  "orange:1F34A"       "watermelon:1F349"  "bag:1F45C"
+
+  # 场景八 · 动物园
+  "elephant:1F418"     "lion:1F981"        "monkey:1F412"     "giraffe:1F992"
+  "penguin:1F427"      "zebra:1F993"       "snake:1F40D"      "leaf:1F343"
 )
 
 for entry in "${MAP[@]}"; do

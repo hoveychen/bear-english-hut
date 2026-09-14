@@ -2,6 +2,14 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1000 / 520;
+  /*
+   * 贴纸尺寸必须跟着地图缩放，所以这里开容器查询。
+   *
+   * 三站的时候贴纸写死 128px 也看不出问题——站点离得远。扩到八站之后，
+   * 站间距只有地图宽的 22%，而 128px 在窄屏上会超过那个距离，于是相邻两张
+   * 贴纸直接压在一起。用 cqw 之后，间距和贴纸都是地图宽的百分比，比例恒定。
+   */
+  container-type: inline-size;
 }
 
 .map__paper {
@@ -9,6 +17,18 @@
   height: 100%;
   display: block;
   filter: drop-shadow(0 8px 0 var(--paper-deep));
+}
+
+.map__slot svg,
+.map__sticker svg,
+.map__flyIn svg {
+  /* 覆盖组件上写死的 width/height 属性 */
+  width: 14cqw;
+  height: 14cqw;
+}
+.map__flyIn svg {
+  width: 16.5cqw;
+  height: 16.5cqw;
 }
 
 .map__slot,

@@ -24,7 +24,7 @@ const WINDOW: Partial<Record<BackdropId, { x: number; y: number; w: number; h: n
 }
 
 export function Backdrop({ id, weather }: Props) {
-  const outdoor = id === 'meadow'
+  const outdoor = id === 'meadow' || id === 'zoo'
   const win = WINDOW[id]
   const showWeather = weather !== null && (outdoor || !!win)
 
@@ -51,6 +51,8 @@ export function Backdrop({ id, weather }: Props) {
         {id === 'kitchen' && <Kitchen />}
         {id === 'bedroom' && <Bedroom />}
         {id === 'livingroom' && <LivingRoom />}
+        {id === 'supermarket' && <Supermarket />}
+        {id === 'zoo' && <Zoo />}
       </g>
 
       {showWeather && (
@@ -203,6 +205,137 @@ function LivingRoom() {
       <path d="M330 440 L330 250" stroke="#2e2a26" strokeWidth="8" strokeLinecap="round" />
       <path d="M290 250 L370 250 L355 190 L305 190 Z" fill="#e9a13b" stroke="#2e2a26" strokeWidth="6" strokeLinejoin="round" />
       <path d="M295 445 Q330 432 365 445" stroke="#2e2a26" strokeWidth="8" strokeLinecap="round" fill="none" />
+    </>
+  )
+}
+
+/**
+ * 超市。室内，所以地板线和 home 一样压在 y=450——舞台物品是固定 108px 按中心
+ * 定位的，各个房间的地面线不统一，同一套 y 坐标就会在这个场景里浮起来。
+ *
+ * 货架全部挂在 y<430 的墙上：小熊站在左侧（约占 x 78~242），物品带在 y>450，
+ * 这两块都不能压。**货架上一个字都不能有**——孩子端是无文字的（设计文档 §7），
+ * 价签和促销牌一律画成色块。
+ */
+function Supermarket() {
+  /* 货架上的商品：三层，每层一排歪歪扭扭的彩色盒子。手摆的，不做成循环等距。 */
+  const shelves = [
+    { y: 150, items: [[330, '#dc5b3c'], [380, '#e9a13b'], [424, '#5b8fa8'], [478, '#dc5b3c'], [524, '#6fae6a'], [576, '#e9a13b'], [626, '#5b8fa8'], [676, '#dc5b3c'], [724, '#6fae6a'], [776, '#e9a13b'], [826, '#5b8fa8'], [876, '#dc5b3c'], [926, '#6fae6a']] },
+    { y: 250, items: [[336, '#6fae6a'], [386, '#5b8fa8'], [430, '#dc5b3c'], [482, '#e9a13b'], [530, '#6fae6a'], [580, '#dc5b3c'], [630, '#e9a13b'], [682, '#5b8fa8'], [730, '#dc5b3c'], [780, '#6fae6a'], [830, '#e9a13b'], [880, '#5b8fa8'], [930, '#dc5b3c']] },
+    { y: 350, items: [[332, '#e9a13b'], [382, '#dc5b3c'], [428, '#6fae6a'], [480, '#5b8fa8'], [528, '#e9a13b'], [578, '#6fae6a'], [628, '#dc5b3c'], [678, '#e9a13b'], [728, '#5b8fa8'], [778, '#dc5b3c'], [828, '#6fae6a'], [878, '#e9a13b'], [928, '#5b8fa8']] },
+  ] as const
+
+  return (
+    <>
+      <rect width="1000" height="450" fill="#eaeef0" />
+
+      {/* 吊顶灯。两盏，各有吊杆和灯罩——只画一条横线的话看着像飘在半空的绳子 */}
+      {[[330, 30], [760, 36]].map(([cx, top]) => (
+        <g key={cx}>
+          <path d={`M${cx} 0 L${cx - 2} ${top}`} stroke="#2e2a26" strokeWidth="5" strokeLinecap="round" />
+          <path
+            d={`M${cx - 84} ${top + 34} L${cx - 58} ${top} L${cx + 58} ${top} L${cx + 84} ${top + 34} Z`}
+            fill="#f3e9c8"
+            stroke="#2e2a26"
+            strokeWidth="5"
+            strokeLinejoin="round"
+          />
+          <path d={`M${cx - 80} ${top + 34} Q${cx} ${top + 42} ${cx + 80} ${top + 34}`} fill="none" stroke="#e9a13b" strokeWidth="7" strokeLinecap="round" />
+        </g>
+      ))}
+
+      {/* 左墙那面彩色横幅。无字，纯色块——孩子端不出现文字 */}
+      <g stroke="#2e2a26" strokeWidth="5" strokeLinejoin="round">
+        <path d="M40 120 L250 112 L250 178 L40 186 Z" fill="#fbf7ec" />
+        <circle cx="88" cy="150" r="17" fill="#dc5b3c" />
+        <circle cx="145" cy="147" r="17" fill="#e9a13b" />
+        <circle cx="202" cy="150" r="17" fill="#6fae6a" />
+      </g>
+
+      {/* 货架本体 */}
+      <g>
+        {shelves.map(({ y, items }) => (
+          <g key={y}>
+            {items.map(([x, fill]) => (
+              <rect
+                key={`${x}`}
+                x={x as number}
+                y={y - 40}
+                width="38"
+                height="40"
+                rx="3"
+                fill={fill as string}
+                stroke="#2e2a26"
+                strokeWidth="3.4"
+              />
+            ))}
+            {/* 隔板：故意不是直线 */}
+            <path d={`M300 ${y} Q650 ${y - 7} 990 ${y + 4}`} fill="none" stroke="#a86e38" strokeWidth="11" strokeLinecap="round" />
+          </g>
+        ))}
+        {/* 两根立柱把三层串成一个柜子 */}
+        <path d="M308 110 Q304 270 310 428" fill="none" stroke="#a86e38" strokeWidth="10" strokeLinecap="round" />
+        <path d="M982 104 Q986 268 980 424" fill="none" stroke="#a86e38" strokeWidth="10" strokeLinecap="round" />
+      </g>
+
+      {/* 地板。压在 450，与 home 同高 */}
+      <rect y="450" width="1000" height="30" fill="#d9cdb4" stroke="#2e2a26" strokeWidth="5" />
+      <rect y="480" width="1000" height="140" fill="#c9bfa6" />
+      {/* 地砖缝，画歪 */}
+      <g stroke="#b3a88e" strokeWidth="4" fill="none">
+        <path d="M130 484 Q124 550 134 618" />
+        <path d="M380 484 Q374 550 384 618" />
+        <path d="M630 484 Q624 550 634 618" />
+        <path d="M880 484 Q874 550 884 618" />
+        <path d="M0 548 Q500 540 1000 552" />
+      </g>
+    </>
+  )
+}
+
+/**
+ * 动物园。户外，所以走 outdoor 分支拿天空底色、天气也画得出来。
+ *
+ * 围栏压在 y=430：物品要站在围栏**前面**的地上（y>450），围栏本身得再高一点，
+ * 否则 108px 的动物会把栏杆整根盖住。
+ */
+function Zoo() {
+  return (
+    <>
+      {/* 远山与树丛 */}
+      <path d="M-20 300 Q160 236 340 296 Q520 240 700 300 Q860 256 1020 304 L1020 640 L-20 640 Z" fill="#9cc294" />
+      <g stroke="#2e2a26" strokeWidth="4" strokeLinejoin="round">
+        {[[90, 300], [190, 286], [286, 302], [392, 290], [496, 304], [600, 288], [694, 300], [790, 286], [890, 302], [966, 292]].map(([x, y]) => (
+          <g key={`${x}-${y}`}>
+            <path d={`M${x} ${y} l-3 34`} stroke="#8a6236" strokeWidth="9" strokeLinecap="round" />
+            <circle cx={x} cy={y - 26} r="34" fill="#6fae6a" />
+            <circle cx={x - 22} cy={y - 8} r="24" fill="#589a57" />
+            <circle cx={x + 22} cy={y - 10} r="23" fill="#7bb873" />
+          </g>
+        ))}
+      </g>
+
+      {/* 草地 */}
+      <path d="M-20 372 Q250 340 520 376 Q760 404 1020 368 L1020 640 L-20 640 Z" fill="#6fae6a" />
+      <path d="M-20 440 Q260 412 540 446 Q790 472 1020 436 L1020 640 L-20 640 Z" fill="#589a57" />
+
+      {/* 围栏：横梁 + 一排削尖的木桩，桩子高矮不一 */}
+      <g stroke="#2e2a26" strokeWidth="4.5" strokeLinejoin="round">
+        {Array.from({ length: 17 }, (_, i) => {
+          const x = 20 + i * 60
+          const top = 330 + ((i * 37) % 13)
+          return <path key={x} d={`M${x} ${top} l13 -16 l13 16 l0 96 l-26 0 Z`} fill="#c98c4e" />
+        })}
+      </g>
+      <path d="M8 372 Q500 362 1000 376" fill="none" stroke="#a86e38" strokeWidth="12" strokeLinecap="round" />
+      <path d="M8 412 Q500 402 1000 416" fill="none" stroke="#a86e38" strokeWidth="12" strokeLinecap="round" />
+
+      {/* 栏前草丛，遮住桩脚，让围栏像插在地里 */}
+      <g stroke="#3f7a43" strokeWidth="5" strokeLinecap="round" fill="none">
+        <path d="M70 452 q6 -26 2 -40 M82 454 q16 -22 22 -34 M58 454 q-10 -20 -18 -30" />
+        <path d="M430 460 q6 -26 2 -40 M442 462 q16 -22 22 -34 M418 462 q-10 -20 -18 -30" />
+        <path d="M880 456 q6 -26 2 -40 M892 458 q16 -22 22 -34 M868 458 q-10 -20 -18 -30" />
+      </g>
     </>
   )
 }
